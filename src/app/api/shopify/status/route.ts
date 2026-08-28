@@ -8,7 +8,6 @@ export async function GET() {
   const required = [
     "NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN",
     "NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_TOKEN",
-    "SHOPIFY_STOREFRONT_PRIVATE_TOKEN",
   ] as const;
 
   const present = {
@@ -17,9 +16,6 @@ export async function GET() {
     ),
     NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_TOKEN: Boolean(
       process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_TOKEN
-    ),
-    SHOPIFY_STOREFRONT_PRIVATE_TOKEN: Boolean(
-      process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN
     ),
   };
 
@@ -33,7 +29,7 @@ export async function GET() {
       missing,
       present,
       hint:
-        "Add NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN, NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_TOKEN, and SHOPIFY_STOREFRONT_PRIVATE_TOKEN in Vercel → Settings → Environment Variables, then redeploy.",
+        "Add NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN and NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_TOKEN in Vercel → Settings → Environment Variables, then redeploy.",
     });
   }
 

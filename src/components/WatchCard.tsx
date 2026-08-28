@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { WatchProduct } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
@@ -20,16 +21,26 @@ export function WatchCard({ product }: { product: WatchProduct }) {
 
   return (
     <Link href={`/products/${product.handle}`} className="product-card block group">
-      <div className="product-card-image relative">
+      <div className="product-card-image relative overflow-hidden">
         {isNew && (
           <span className="badge-promo absolute top-3 left-3 z-10">Just In</span>
         )}
         {isEnquiry && !isNew && (
           <span className="badge-promo absolute top-3 left-3 z-10">By Request</span>
         )}
-        <span className="type-caption-sm text-[var(--color-stone)] uppercase tracking-wide">
-          {product.vendor}
-        </span>
+        {product.imageUrl ? (
+          <Image
+            src={product.imageUrl}
+            alt={product.title}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover"
+          />
+        ) : (
+          <span className="type-caption-sm text-[var(--color-stone)] uppercase tracking-wide">
+            {product.vendor}
+          </span>
+        )}
       </div>
 
       <div className="pt-2 space-y-2">

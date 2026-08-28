@@ -1,9 +1,10 @@
 import { BrandTile } from "@/components/BrandTile";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { brands } from "@/lib/data";
+import { getBrands } from "@/lib/data";
 
-export default function BrandsPage() {
+export default async function BrandsPage() {
+  const brands = await getBrands();
   const haute = brands.filter((b) => b.tier === "haute");
   const premium = brands.filter((b) => b.tier === "premium");
 

@@ -2,7 +2,7 @@ import { BrandTile, CampaignTile } from "@/components/BrandTile";
 import { EditorialBrandSection } from "@/components/EditorialBrandSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WatchCard } from "@/components/WatchCard";
-import { brands, products } from "@/lib/data";
+import { getBrands, getProducts } from "@/lib/data";
 
 const categories = [
   { title: "Men's", href: "/collections/mens-watches" },
@@ -13,7 +13,8 @@ const categories = [
   { title: "Premium", href: "/collections/premium-watches" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [brands, products] = await Promise.all([getBrands(), getProducts()]);
   const featured = products.filter((p) => p.tags.includes("featured"));
   const newArrivals = products.filter((p) => p.tags.includes("new"));
   const bestSellers = products.filter((p) => p.tags.includes("bestseller"));

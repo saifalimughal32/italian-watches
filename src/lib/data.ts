@@ -1,37 +1,83 @@
 import { mockBrands, mockProducts } from "./mock-data";
+import { isShopifyConfigured } from "./shopify/config";
+import {
+  fetchAllProducts,
+  fetchBrands,
+  fetchCollectionByHandle,
+  fetchProductByHandle,
+  searchProducts,
+} from "./shopify/queries";
 import type { Brand, WatchProduct } from "./types";
 
-export const brands = mockBrands;
-export const products = mockProducts;
+export async function getBrands(): Promise<Brand[]> {
+  if (!isShopifyConfigured()) return mockBrands;
 
-export function getBrand(handle: string) {
+  try {
+    const brands = await fetchBrands();
+    return brands.length ? brands : mockBrands;
+  } catch {
+    return mockBrands;
+  }
+}
+
+export async function getProducts(): Promise<WatchProduct[]> {
+  if (!isShopifyConfigured()) return mockProducts;
+
+  try {
+    const products = await fetchAllProducts();
+    return products.length ? products : mockProducts;
+  } catch {
+    return mockProducts;
+  }
+}
+
+export async function getProduct(handle: string): Promise<WatchProduct | undefined> {
+  if (!isShopifyConfigured()) {
+    return mockProducts.find((product) => product.handle === handle);
+  }
+
+  try {
+    const product = await fetchProductByHandle(handle);
+    if (product) return product;
+  } catch {
+    // fall through to mock data
+  }
+
+  return mockProducts.find((product) => product.handle === handle);
+}
+
+export async function getBrand(handle: string): Promise<Brand | undefined> {
+  const brands = await getBrands();
   return brands.find((brand) => brand.handle === handle);
 }
 
-export function getProduct(handle: string) {
-  return products.find((product) => product.handle === handle);
-}
-
-export function getProductsByBrand(brandName: string) {
+export async function getProductsByBrand(brandName: string): Promise<WatchProduct[]> {
+  const products = await getProducts();
   return products.filter((product) => product.vendor === brandName);
 }
 
-export function getProductsByLine(line: string) {
-  return products.filter((product) => product.metafields.line === line);
-}
-
-export function getCollectionProducts(handle: string): {
+export async function getCollectionProducts(handle: string): Promise<{
   title: string;
   description: string;
   products: WatchProduct[];
-} | null {
-  const brand = getBrand(handle);
+} | null> {
+  if (isShopifyConfigured()) {
+    try {
+      const collection = await fetchCollectionByHandle(handle);
+      if (collection) return collection;
+    } catch {
+      // fall through to local filters
+    }
+  }
+
+  const brand = await getBrand(handle);
+  const products = await getProducts();
 
   if (brand) {
     return {
       title: brand.name,
       description: brand.heritage,
-      products: getProductsByBrand(brand.name),
+      products: products.filter((product) => product.vendor === brand.name),
     };
   }
 
@@ -77,10 +123,20 @@ export function getCollectionProducts(handle: string): {
   };
 }
 
-export function searchCatalog(query: string) {
-  if (!query.trim()) return products;
+export async function searchCatalog(query: string): Promise<WatchProduct[]> {
+  if (!query.trim()) return getProducts();
+
+  if (isShopifyConfigured()) {
+    try {
+      const results = await searchProducts(query);
+      if (results.length) return results;
+    } catch {
+      // fall through to local search
+    }
+  }
 
   const normalized = query.toLowerCase();
+  const products = await getProducts();
 
   return products.filter(
     (product) =>
@@ -91,7 +147,11 @@ export function searchCatalog(query: string) {
   );
 }
 
-export function formatPrice(price: string, purchaseMode: string, currencyCode = "USD") {
+export function formatPrice(
+  price: string,
+  purchaseMode: string,
+  currencyCode = "USD"
+) {
   if (purchaseMode === "enquiry" || parseFloat(price) === 0) {
     return "Price on request";
   }

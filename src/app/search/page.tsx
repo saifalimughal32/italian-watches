@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WatchCard } from "@/components/WatchCard";
-import { products, searchCatalog } from "@/lib/data";
+import { getProducts, searchCatalog } from "@/lib/data";
 
 export default async function SearchPage({
   searchParams,
@@ -9,7 +9,12 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const results = searchCatalog(q);
+  const [products, results] = await Promise.all([
+    getProducts(),
+    q ? searchCatalog(q) : Promise.resolve([]),
+  ]);
+
+  const items = q ? results : products;
 
   return (
     <Container>
@@ -37,11 +42,11 @@ export default async function SearchPage({
         </form>
         {q && (
           <p className="type-caption-md mb-8">
-            {results.length} result{results.length === 1 ? "" : "s"} for &ldquo;{q}&rdquo;
+            {items.length} result{items.length === 1 ? "" : "s"} for &ldquo;{q}&rdquo;
           </p>
         )}
         <div className="grid-products">
-          {(q ? results : products).map((product) => (
+          {items.map((product) => (
             <WatchCard key={product.id} product={product} />
           ))}
         </div>

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { FilterChip } from "@/components/ui/FilterChip";
 import { Container } from "@/components/ui/Container";
 import { WatchCard } from "@/components/WatchCard";
-import { brands, getBrand, getCollectionProducts } from "@/lib/data";
+import { getBrand, getBrands, getCollectionProducts } from "@/lib/data";
 
 export default async function CollectionPage({
   params,
@@ -10,10 +10,14 @@ export default async function CollectionPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const collection = getCollectionProducts(handle);
+  const [brands, collection] = await Promise.all([
+    getBrands(),
+    getCollectionProducts(handle),
+  ]);
+
   if (!collection) notFound();
 
-  const brand = getBrand(handle);
+  const brand = await getBrand(handle);
   const { title, description, products: items } = collection;
 
   return (

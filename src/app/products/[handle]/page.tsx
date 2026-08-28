@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -11,12 +12,20 @@ export default async function ProductPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const product = getProduct(handle);
+  const product = await getProduct(handle);
   if (!product) notFound();
 
   const { metafields } = product;
   const isEnquiry = metafields.purchase_mode === "enquiry";
-  const related = getProductsByBrand(product.vendor).filter((p) => p.id !== product.id);
+  const related = (await getProductsByBrand(product.vendor)).filter(
+    (p) => p.id !== product.id
+  );
+  const galleryImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.imageUrl
+        ? [product.imageUrl]
+        : [];
 
   const specs = [
     ["Reference", metafields.reference_number],
@@ -38,20 +47,35 @@ export default async function ProductPage({
 
         <div className="grid lg:grid-cols-2 gap-8">
           <div>
-            <div className="product-card-image aspect-square">
-              <span className="type-caption-sm text-[var(--color-stone)] uppercase">
-                Product Image
-              </span>
-            </div>
-            <div className="flex gap-2 mt-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="w-16 h-16 product-card-image"
-                  style={{ aspectRatio: "1" }}
+            <div className="product-card-image aspect-square relative overflow-hidden">
+              {galleryImages[0] ? (
+                <Image
+                  src={galleryImages[0]}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                  priority
                 />
-              ))}
+              ) : (
+                <span className="type-caption-sm text-[var(--color-stone)] uppercase">
+                  Product Image
+                </span>
+              )}
             </div>
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 mt-2">
+                {galleryImages.slice(0, 4).map((image) => (
+                  <div
+                    key={image}
+                    className="w-16 h-16 product-card-image relative overflow-hidden"
+                    style={{ aspectRatio: "1" }}
+                  >
+                    <Image src={image} alt="" fill sizes="64px" className="object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>

@@ -1,8 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FilterChip } from "@/components/ui/FilterChip";
 import { Container } from "@/components/ui/Container";
-import { WatchCard } from "@/components/WatchCard";
+import { CollectionGrid } from "@/components/collections/CollectionGrid";
 import { getBrand, getBrands, getCollectionProducts } from "@/lib/data";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const collection = await getCollectionProducts(handle);
+  if (!collection) return { title: "Collection | Italian Watches" };
+
+  return {
+    title: `${collection.title} | Italian Watches`,
+    description: collection.description || `Shop ${collection.title} at Italian Watches.`,
+  };
+}
 
 export default async function CollectionPage({
   params,
@@ -26,7 +42,6 @@ export default async function CollectionPage({
         <Container>
           <div className="flex items-center justify-between h-12 type-caption-md">
             <span>Home / {title}</span>
-            <span className="hidden sm:inline type-body-strong">Sort By: Featured</span>
           </div>
         </Container>
       </div>
@@ -54,11 +69,7 @@ export default async function CollectionPage({
             ))}
           </div>
 
-          <div className="grid-products">
-            {items.map((product) => (
-              <WatchCard key={product.id} product={product} />
-            ))}
-          </div>
+          <CollectionGrid products={items} />
         </div>
       </Container>
     </>

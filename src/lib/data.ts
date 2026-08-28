@@ -1,3 +1,4 @@
+import { brandsFromProducts, mergeBrands, vendorToBrand } from "./brands";
 import { mockBrands, mockProducts } from "./mock-data";
 import { isShopifyConfigured } from "./shopify/config";
 import {
@@ -8,13 +9,16 @@ import {
   searchProducts,
 } from "./shopify/queries";
 import type { Brand, WatchProduct } from "./types";
+import { slugify } from "./utils";
 
 export async function getBrands(): Promise<Brand[]> {
   if (!isShopifyConfigured()) return mockBrands;
 
   try {
-    const brands = await fetchBrands();
-    return brands.length ? brands : mockBrands;
+    const [metaBrands, products] = await Promise.all([fetchBrands(), fetchAllProducts()]);
+    const derived = brandsFromProducts(products);
+    const merged = mergeBrands(metaBrands, derived);
+    return merged.length ? merged : mockBrands;
   } catch {
     return mockBrands;
   }
@@ -48,12 +52,48 @@ export async function getProduct(handle: string): Promise<WatchProduct | undefin
 
 export async function getBrand(handle: string): Promise<Brand | undefined> {
   const brands = await getBrands();
-  return brands.find((brand) => brand.handle === handle);
+  return (
+    brands.find((brand) => brand.handle === handle) ??
+    brands.find((brand) => slugify(brand.name) === handle)
+  );
 }
 
 export async function getProductsByBrand(brandName: string): Promise<WatchProduct[]> {
   const products = await getProducts();
   return products.filter((product) => product.vendor === brandName);
+}
+
+function productMatchesCollection(handle: string, product: WatchProduct) {
+  const price = parseFloat(product.price);
+  const filters: Record<string, (item: WatchProduct) => boolean> = {
+    all: () => true,
+    "tissot-prx": (item) =>
+      item.metafields.line === "prx" || item.title.toLowerCase().includes("prx"),
+    "mens-watches": (item) =>
+      ["men", "unisex"].includes(item.metafields.gender) ||
+      item.title.toLowerCase().includes("men"),
+    "womens-watches": (item) =>
+      ["women", "unisex"].includes(item.metafields.gender) ||
+      item.title.toLowerCase().includes("women"),
+    "automatic-watches": (item) =>
+      item.metafields.movement === "automatic" ||
+      item.title.toLowerCase().includes("automatic"),
+    "chronograph-watches": (item) =>
+      item.metafields.is_chronograph ||
+      item.metafields.movement === "chronograph" ||
+      item.title.toLowerCase().includes("chronograph"),
+    "luxury-watches": (item) => item.metafields.tier === "luxury" || price >= 50000,
+    "premium-watches": (item) => item.metafields.tier === "premium" || price < 50000,
+    "new-arrivals": (item) => item.tags.includes("new"),
+    "best-sellers": (item) => item.tags.includes("bestseller"),
+    "limited-editions": (item) => item.tags.includes("limited"),
+  };
+
+  const vendorMatch = slugify(product.vendor) === handle;
+  if (vendorMatch) return true;
+
+  const filter = filters[handle];
+  return filter ? filter(product) : false;
 }
 
 export async function getCollectionProducts(handle: string): Promise<{
@@ -73,42 +113,38 @@ export async function getCollectionProducts(handle: string): Promise<{
   if (isShopifyConfigured()) {
     try {
       const collection = await fetchCollectionByHandle(handle);
-      if (collection) return collection;
+      if (collection && collection.products.length > 0) return collection;
     } catch {
-      // fall through to local filters
+      // fall through
     }
   }
 
-  const brand = await getBrand(handle);
   const products = await getProducts();
+  const brand = await getBrand(handle);
 
   if (brand) {
+    const brandProducts = products.filter((product) => product.vendor === brand.name);
+    if (brandProducts.length > 0) {
+      return {
+        title: brand.name,
+        description: brand.heritage,
+        products: brandProducts,
+      };
+    }
+  }
+
+  const vendorProducts = products.filter((product) => slugify(product.vendor) === handle);
+  if (vendorProducts.length > 0) {
+    const vendorBrand = vendorToBrand(vendorProducts[0].vendor);
     return {
-      title: brand.name,
-      description: brand.heritage,
-      products: products.filter((product) => product.vendor === brand.name),
+      title: vendorBrand.name,
+      description: vendorBrand.heritage,
+      products: vendorProducts,
     };
   }
 
-  const filters: Record<string, (product: WatchProduct) => boolean> = {
-    all: () => true,
-    "tissot-prx": (product) => product.metafields.line === "prx",
-    "mens-watches": (product) =>
-      ["men", "unisex"].includes(product.metafields.gender),
-    "womens-watches": (product) =>
-      ["women", "unisex"].includes(product.metafields.gender),
-    "automatic-watches": (product) => product.metafields.movement === "automatic",
-    "chronograph-watches": (product) =>
-      product.metafields.is_chronograph ||
-      product.metafields.movement === "chronograph",
-    "luxury-watches": (product) => product.metafields.tier === "luxury",
-    "premium-watches": (product) => product.metafields.tier === "premium",
-    "new-arrivals": (product) => product.tags.includes("new"),
-    "best-sellers": (product) => product.tags.includes("bestseller"),
-  };
-
-  const filter = filters[handle];
-  if (!filter) return null;
+  const filtered = products.filter((product) => productMatchesCollection(handle, product));
+  if (!filtered.length) return null;
 
   const titles: Record<string, string> = {
     all: "All Watches",
@@ -121,16 +157,19 @@ export async function getCollectionProducts(handle: string): Promise<{
     "premium-watches": "Premium Watches",
     "new-arrivals": "New Arrivals",
     "best-sellers": "Best Sellers",
+    "limited-editions": "Limited Editions",
   };
 
   const descriptions: Record<string, string> = {
     "tissot-prx": "The icon of accessible Swiss luxury.",
+    "luxury-watches": "Haute horology and exceptional complications.",
+    "premium-watches": "Swiss precision and everyday elegance.",
   };
 
   return {
     title: titles[handle] ?? handle.replace(/-/g, " "),
     description: descriptions[handle] ?? "",
-    products: products.filter(filter),
+    products: filtered,
   };
 }
 
@@ -142,7 +181,7 @@ export async function searchCatalog(query: string): Promise<WatchProduct[]> {
       const results = await searchProducts(query);
       if (results.length) return results;
     } catch {
-      // fall through to local search
+      // fall through
     }
   }
 

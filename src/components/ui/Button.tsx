@@ -15,12 +15,16 @@ export function Button({
   children,
   className = "",
   type = "button",
+  disabled,
+  onClick,
 }: {
   variant?: Variant;
   href?: string;
   children: ReactNode;
   className?: string;
   type?: "button" | "submit";
+  disabled?: boolean;
+  onClick?: () => void | Promise<void>;
 }) {
   const cls = `${classes[variant]} ${className}`.trim();
 
@@ -33,7 +37,7 @@ export function Button({
   }
 
   return (
-    <button type={type} className={cls}>
+    <button type={type} className={cls} disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );

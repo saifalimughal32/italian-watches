@@ -5,6 +5,7 @@ export const PRODUCT_FRAGMENT = `
     handle
     vendor
     tags
+    description
     featuredImage {
       url
       altText
@@ -19,6 +20,17 @@ export const PRODUCT_FRAGMENT = `
       minVariantPrice {
         amount
         currencyCode
+      }
+    }
+    variants(first: 20) {
+      nodes {
+        id
+        title
+        availableForSale
+        price {
+          amount
+          currencyCode
+        }
       }
     }
     metafields(identifiers: [
@@ -40,6 +52,37 @@ export const PRODUCT_FRAGMENT = `
       key
       value
       type
+    }
+  }
+`;
+
+export const CART_FRAGMENT = `
+  fragment CartFields on Cart {
+    id
+    checkoutUrl
+    totalQuantity
+    lines(first: 50) {
+      nodes {
+        id
+        quantity
+        merchandise {
+          ... on ProductVariant {
+            id
+            title
+            price {
+              amount
+              currencyCode
+            }
+            product {
+              title
+              handle
+              featuredImage {
+                url
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;

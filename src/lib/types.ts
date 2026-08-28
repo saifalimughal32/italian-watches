@@ -1,5 +1,13 @@
 export type PurchaseMode = "checkout" | "enquiry";
 
+export interface ProductVariant {
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  price: string;
+  currencyCode: string;
+}
+
 export interface WatchMetafields {
   line: string;
   reference_number: string;
@@ -27,19 +35,38 @@ export interface WatchProduct {
   currencyCode?: string;
   imageUrl?: string;
   images?: string[];
+  description?: string;
+  variantId?: string;
+  variants?: ProductVariant[];
   metafields: WatchMetafields;
 }
 
 export interface Brand {
   handle: string;
   name: string;
-  /** Uppercase lines for editorial campaign tiles */
   displayLines: string[];
   tier: "haute" | "premium";
   enquiry_only: boolean;
   tagline: string;
   heritage: string;
   collection_handle: string;
-  /** Path under /public, e.g. /brands/rolex.png */
   logo?: string;
+}
+
+export interface CartLine {
+  id: string;
+  quantity: number;
+  variantId: string;
+  title: string;
+  handle: string;
+  imageUrl?: string;
+  price: string;
+  currencyCode: string;
+}
+
+export interface Cart {
+  id: string;
+  checkoutUrl: string;
+  totalQuantity: number;
+  lines: CartLine[];
 }

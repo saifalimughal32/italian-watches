@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import type { WatchProduct } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
 import { getProductDisplay } from "@/lib/product-display";
+import { WishlistButton } from "@/components/wishlist/WishlistButton";
 
 const swatchColors: Record<string, string> = {
   Blue: "#1a3a5c",
@@ -20,7 +23,18 @@ export function WatchCard({ product }: { product: WatchProduct }) {
   const { modelName, subtitle } = getProductDisplay(product);
 
   return (
-    <Link href={`/products/${product.handle}`} className="product-card block group">
+    <div className="product-card group relative">
+      <div className="absolute top-3 right-3 z-20">
+        <div
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+        >
+          <WishlistButton handle={product.handle} />
+        </div>
+      </div>
+      <Link href={`/products/${product.handle}`} className="block">
       <div className="product-card-image relative overflow-hidden">
         {isNew && (
           <span className="badge-promo absolute top-3 left-3 z-10">Just In</span>
@@ -63,6 +77,7 @@ export function WatchCard({ product }: { product: WatchProduct }) {
           )}
         </p>
       </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

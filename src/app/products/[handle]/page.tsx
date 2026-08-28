@@ -1,10 +1,26 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/Button";
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ProductActions } from "@/components/products/ProductActions";
 import { WatchCard } from "@/components/WatchCard";
 import { formatPrice, getProduct, getProductsByBrand } from "@/lib/data";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const product = await getProduct(handle);
+  if (!product) return { title: "Product | Italian Watches" };
+
+  return {
+    title: `${product.title} | Italian Watches`,
+    description: `${product.vendor} — ${product.title}`,
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -110,21 +126,12 @@ export default async function ProductPage({
               ))}
             </div>
 
-            <div className="mt-8">
-              {isEnquiry ? (
-                <Button
-                  variant="primary"
-                  href={`/contact?reference=${metafields.reference_number}&product=${encodeURIComponent(product.title)}`}
-                  className="w-full"
-                >
-                  Request Availability
-                </Button>
-              ) : (
-                <Button variant="primary" className="w-full">
-                  Add to Bag
-                </Button>
-              )}
-            </div>
+            <ProductActions
+              handle={product.handle}
+              variantId={product.variantId ?? product.variants?.[0]?.id}
+              isEnquiry={isEnquiry}
+              contactHref={`/contact?reference=${metafields.reference_number}&product=${encodeURIComponent(product.title)}`}
+            />
 
             <div className="mt-10">
               {["View Product Details", "Shipping & Returns", "Authenticity Guarantee"].map(

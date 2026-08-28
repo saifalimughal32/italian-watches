@@ -2,57 +2,51 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Brand } from "@/lib/types";
 
-function BrandLogo({ brand }: { brand: Brand }) {
-  if (brand.logo) {
-    return (
-      <div className="mb-3 flex h-16 w-full items-center justify-center">
-        <Image
-          src={brand.logo}
-          alt={`${brand.name} logo`}
-          width={140}
-          height={64}
-          className="h-14 w-auto max-w-[140px] object-contain"
-        />
-      </div>
-    );
-  }
+export function BrandTile({
+  brand,
+  editorial = false,
+  image,
+}: {
+  brand: Brand;
+  editorial?: boolean;
+  image?: string;
+}) {
+  const collectionImage = image ?? brand.collectionImage;
 
-  return <div className="type-heading-lg mb-2">{brand.name.charAt(0)}</div>;
-}
-
-export function BrandTile({ brand, editorial = false }: { brand: Brand; editorial?: boolean }) {
   if (editorial) {
     return (
       <Link
         href={`/collections/${brand.collection_handle}`}
-        className="campaign-tile campaign-tile--portrait block min-h-[280px] md:min-h-[320px]"
-        style={{
-          background: `linear-gradient(to top, rgba(17,17,17,0.75) 0%, rgba(17,17,17,0.2) 55%, transparent 100%), var(--color-charcoal)`,
-        }}
+        className="brand-editorial-tile group"
       >
-        <div className="w-full">
-          {brand.logo ? (
-            <div className="mb-4 flex justify-start">
-              <Image
-                src={brand.logo}
-                alt={`${brand.name} logo`}
-                width={120}
-                height={56}
-                className="h-12 w-auto max-w-[120px] object-contain"
-              />
-            </div>
-          ) : (
-            <h3 className="type-brand-lockup text-[var(--color-canvas)]">
+        {collectionImage ? (
+          <Image
+            src={collectionImage}
+            alt={`${brand.name} collection`}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[var(--color-charcoal)]" />
+        )}
+
+        <div className="brand-editorial-tile__overlay" />
+
+        <div className="brand-editorial-tile__content">
+          <div>
+            <h3 className="brand-editorial-tile__title">
               {brand.displayLines.map((line) => (
                 <span key={line} className="block">
                   {line}
                 </span>
               ))}
             </h3>
-          )}
-          <div className="mt-6">
-            <span className="btn-outline-on-image">Shop</span>
+            {brand.tagline && (
+              <p className="brand-editorial-tile__tagline">{brand.tagline}</p>
+            )}
           </div>
+          <span className="btn-outline-on-image">Shop {brand.name}</span>
         </div>
       </Link>
     );
@@ -61,12 +55,50 @@ export function BrandTile({ brand, editorial = false }: { brand: Brand; editoria
   return (
     <Link
       href={`/collections/${brand.collection_handle}`}
-      className="product-card block text-center py-10 px-4 min-h-[200px] flex flex-col items-center justify-center"
-      style={{ background: "var(--color-soft-cloud)" }}
+      className="brand-compact-tile group"
     >
-      <BrandLogo brand={brand} />
-      <h3 className="type-body-strong">{brand.name}</h3>
-      <p className="type-caption-md mt-2 max-w-[200px]">{brand.tagline}</p>
+      {collectionImage ? (
+        <Image
+          src={collectionImage}
+          alt={`${brand.name} collection`}
+          fill
+          sizes="(max-width: 768px) 50vw, 20vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-[var(--color-soft-cloud)]" />
+      )}
+      <div className="brand-compact-tile__overlay" />
+      <div className="brand-compact-tile__content">
+        <h3 className="type-body-strong text-[var(--color-canvas)]">{brand.name}</h3>
+        <p className="type-caption-sm text-[var(--color-stone)] mt-1 line-clamp-2">
+          {brand.tagline}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+export function CategoryTile({
+  title,
+  href,
+  image,
+}: {
+  title: string;
+  href: string;
+  image: string;
+}) {
+  return (
+    <Link href={href} className="category-tile group">
+      <Image
+        src={image}
+        alt={title}
+        fill
+        sizes="(max-width: 768px) 33vw, 16vw"
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="category-tile__overlay" />
+      <span className="category-tile__label">{title}</span>
     </Link>
   );
 }
@@ -89,20 +121,8 @@ export function CampaignTile({
   const displayLines = lines ?? headline.split(" ");
 
   return (
-    <Link
-      href={href}
-      className="campaign-tile block"
-      style={
-        image
-          ? undefined
-          : {
-              background: dark
-                ? "linear-gradient(135deg, #111 0%, #39393b 100%)"
-                : "linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%)",
-            }
-      }
-    >
-      {image && (
+    <Link href={href} className="campaign-tile block group">
+      {image ? (
         <>
           <Image
             src={image}
@@ -110,16 +130,19 @@ export function CampaignTile({
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
           />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(17,17,17,0.75) 0%, rgba(17,17,17,0.25) 45%, rgba(17,17,17,0.1) 100%)",
-            }}
-          />
+          <div className="campaign-tile__overlay" />
         </>
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: dark
+              ? "linear-gradient(135deg, #111 0%, #39393b 100%)"
+              : "linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%)",
+          }}
+        />
       )}
       <div className="relative z-10">
         <h2

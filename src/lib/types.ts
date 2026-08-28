@@ -51,6 +51,7 @@ export interface Brand {
   heritage: string;
   collection_handle: string;
   logo?: string;
+  collectionImage?: string;
 }
 
 export interface CartLine {

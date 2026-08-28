@@ -1,12 +1,14 @@
 import { BrandTile } from "@/components/BrandTile";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { getBrands } from "@/lib/data";
+import { enrichBrandsWithImages } from "@/lib/brand-images";
+import { getBrands, getProducts } from "@/lib/data";
 
 export default async function BrandsPage() {
-  const brands = await getBrands();
-  const haute = brands.filter((b) => b.tier === "haute");
-  const premium = brands.filter((b) => b.tier === "premium");
+  const [brands, products] = await Promise.all([getBrands(), getProducts()]);
+  const enriched = enrichBrandsWithImages(brands, products);
+  const haute = enriched.filter((b) => b.tier === "haute");
+  const premium = enriched.filter((b) => b.tier === "premium");
 
   return (
     <Container>

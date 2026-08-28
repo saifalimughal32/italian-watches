@@ -12,6 +12,7 @@ export const mockBrands: Brand[] = [
       "Founded in 1905, Rolex has defined the modern luxury sports watch.",
     collection_handle: "rolex",
     logo: "/brands/rolex.png",
+    collectionImage: "/collections/rolex.jpg",
   },
   {
     handle: "audemars-piguet",
@@ -23,6 +24,7 @@ export const mockBrands: Brand[] = [
     heritage:
       "Since 1875, Audemars Piguet has pushed the boundaries of haute horlogerie.",
     collection_handle: "audemars-piguet",
+    collectionImage: "/collections/audemars-piguet.jpg",
   },
   {
     handle: "patek-philippe",
@@ -34,6 +36,7 @@ export const mockBrands: Brand[] = [
     heritage:
       "The last family-owned independent watch manufacturer in Geneva.",
     collection_handle: "patek-philippe",
+    collectionImage: "/collections/patek-philippe.jpg",
   },
   {
     handle: "hublot",
@@ -45,6 +48,7 @@ export const mockBrands: Brand[] = [
     heritage:
       "Hublot pioneered the fusion of precious materials with innovative design.",
     collection_handle: "hublot",
+    collectionImage: "/collections/hublot.jpg",
   },
   {
     handle: "tissot",
@@ -55,6 +59,7 @@ export const mockBrands: Brand[] = [
     tagline: "Innovators by tradition since 1853",
     heritage: "Tissot brings Swiss precision to accessible luxury.",
     collection_handle: "tissot",
+    collectionImage: "/collections/tissot.jpg",
   },
 ];
 

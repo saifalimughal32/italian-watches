@@ -1,22 +1,32 @@
-import { BrandTile, CampaignTile } from "@/components/BrandTile";
+import { BrandTile, CampaignTile, CategoryTile } from "@/components/BrandTile";
 import { EditorialBrandSection } from "@/components/EditorialBrandSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WatchCard } from "@/components/WatchCard";
+import { enrichBrandsWithImages, CATEGORY_COLLECTION_IMAGES } from "@/lib/brand-images";
 import { getBrands, getProducts } from "@/lib/data";
+import { mockBrands } from "@/lib/mock-data";
 
 export const revalidate = 60;
 
 const categories = [
-  { title: "Men's", href: "/collections/mens-watches" },
-  { title: "Women's", href: "/collections/womens-watches" },
-  { title: "Automatic", href: "/collections/automatic-watches" },
-  { title: "Chronograph", href: "/collections/chronograph-watches" },
-  { title: "Luxury", href: "/collections/luxury-watches" },
-  { title: "Premium", href: "/collections/premium-watches" },
+  { title: "Men's", href: "/collections/mens-watches", image: CATEGORY_COLLECTION_IMAGES["mens-watches"] },
+  { title: "Women's", href: "/collections/womens-watches", image: CATEGORY_COLLECTION_IMAGES["womens-watches"] },
+  { title: "Automatic", href: "/collections/automatic-watches", image: CATEGORY_COLLECTION_IMAGES["automatic-watches"] },
+  { title: "Chronograph", href: "/collections/chronograph-watches", image: CATEGORY_COLLECTION_IMAGES["chronograph-watches"] },
+  { title: "Luxury", href: "/collections/luxury-watches", image: CATEGORY_COLLECTION_IMAGES["luxury-watches"] },
+  { title: "Premium", href: "/collections/premium-watches", image: CATEGORY_COLLECTION_IMAGES["premium-watches"] },
 ];
 
 export default async function HomePage() {
   const [brands, products] = await Promise.all([getBrands(), getProducts()]);
+  const hauteBrands = enrichBrandsWithImages(
+    mockBrands.filter((brand) => brand.tier === "haute"),
+    products
+  );
+  const premiumBrands = enrichBrandsWithImages(
+    brands.filter((brand) => brand.tier === "premium"),
+    products
+  );
   const featured =
     products.filter((p) => p.tags.includes("featured")).length > 0
       ? products.filter((p) => p.tags.includes("featured"))
@@ -33,6 +43,7 @@ export default async function HomePage() {
     products.filter((p) => p.metafields.line === "prx").length > 0
       ? products.filter((p) => p.metafields.line === "prx")
       : products.slice(0, 3);
+  const rolexProducts = products.filter((product) => product.vendor === "Rolex");
 
   return (
     <>
@@ -55,30 +66,35 @@ export default async function HomePage() {
       </section>
 
       <section className="container-nike section-rhythm">
-        <SectionHeading title="Shop by Brand" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
-          {brands.slice(0, 4).map((brand) => (
+        <SectionHeading
+          title="Shop by Brand"
+          subtitle="Haute horology houses and premium Swiss manufactures"
+        />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+          {hauteBrands.map((brand) => (
             <BrandTile key={brand.handle} brand={brand} editorial />
           ))}
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 mt-2">
-          {brands.map((brand) => (
-            <BrandTile key={brand.handle} brand={brand} />
-          ))}
-        </div>
+        {premiumBrands.length > 0 && (
+          <>
+            <h3 className="type-caption-md mt-10 mb-4 uppercase tracking-wide">Premium Swiss</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+              {premiumBrands.map((brand) => (
+                <BrandTile key={brand.handle} brand={brand} />
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       <section className="container-nike section-rhythm">
         <EditorialBrandSection
-          lines={["ROYAL", "OAK"]}
-          tagline="Since 1972, the icon that redefined luxury sports watches."
-          href="/collections/audemars-piguet"
-          cta="Explore AP"
-          products={
-            products.filter((p) => p.vendor === "Audemars Piguet").length > 0
-              ? products.filter((p) => p.vendor === "Audemars Piguet")
-              : products.slice(0, 4)
-          }
+          lines={["ROLEX", "COLLECTION"]}
+          tagline="The crown of Swiss watchmaking — sports models, dress watches, and icons."
+          href="/collections/rolex"
+          cta="Explore Rolex"
+          image="/collections/rolex.jpg"
+          products={rolexProducts.length > 0 ? rolexProducts.slice(0, 3) : products.slice(0, 3)}
         />
       </section>
 
@@ -93,19 +109,9 @@ export default async function HomePage() {
 
       <section className="container-nike section-rhythm">
         <SectionHeading title="Shop by Category" />
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
           {categories.map((cat) => (
-            <a
-              key={cat.href}
-              href={cat.href}
-              className="product-card text-center py-8 px-2"
-              style={{ background: "var(--color-soft-cloud)" }}
-            >
-              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[var(--color-canvas)] flex items-center justify-center type-body-strong">
-                {cat.title.charAt(0)}
-              </div>
-              <span className="type-caption-md text-[var(--color-ink)]">{cat.title}</span>
-            </a>
+            <CategoryTile key={cat.href} title={cat.title} href={cat.href} image={cat.image} />
           ))}
         </div>
       </section>

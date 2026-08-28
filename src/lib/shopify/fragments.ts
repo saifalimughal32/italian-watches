@@ -6,6 +6,7 @@ export const PRODUCT_FRAGMENT = `
     vendor
     tags
     description
+    descriptionHtml
     featuredImage {
       url
       altText

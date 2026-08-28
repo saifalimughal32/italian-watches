@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -6,6 +7,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProductActions } from "@/components/products/ProductActions";
 import { WatchCard } from "@/components/WatchCard";
 import { formatPrice, getProduct, getProductsByBrand } from "@/lib/data";
+import { inferBrandHandle } from "@/lib/brand-inference";
+import { getProductDescription } from "@/lib/format-description";
 
 export async function generateMetadata({
   params,
@@ -18,7 +21,8 @@ export async function generateMetadata({
 
   return {
     title: `${product.title} | Italian Watches`,
-    description: `${product.vendor} — ${product.title}`,
+    description:
+      getProductDescription(product.description) || `${product.vendor} — ${product.title}`,
   };
 }
 
@@ -33,6 +37,8 @@ export default async function ProductPage({
 
   const { metafields } = product;
   const isEnquiry = metafields.purchase_mode === "enquiry";
+  const brandHandle = inferBrandHandle(product.vendor);
+  const description = getProductDescription(product.description);
   const related = (await getProductsByBrand(product.vendor)).filter(
     (p) => p.id !== product.id
   );
@@ -58,7 +64,9 @@ export default async function ProductPage({
     <Container>
       <div className="section-rhythm">
         <p className="type-caption-md mb-6">
-          Home / {product.vendor} / {metafields.line || product.title}
+          <Link href="/">Home</Link> /{" "}
+          <Link href={`/collections/${brandHandle}`}>{product.vendor}</Link> /{" "}
+          {metafields.line || product.title}
         </p>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -95,7 +103,9 @@ export default async function ProductPage({
           </div>
 
           <div>
-            <p className="type-caption-md">{product.vendor}</p>
+            <Link href={`/collections/${brandHandle}`} className="type-caption-md hover:opacity-70">
+              {product.vendor}
+            </Link>
             <h1 className="type-heading-xl mt-2 normal-case">{product.title}</h1>
             {metafields.reference_number && (
               <p className="type-caption-md mt-2">Ref. {metafields.reference_number}</p>
@@ -132,6 +142,15 @@ export default async function ProductPage({
               isEnquiry={isEnquiry}
               contactHref={`/contact?reference=${metafields.reference_number}&product=${encodeURIComponent(product.title)}`}
             />
+
+            {description && (
+              <div className="mt-10">
+                <h2 className="type-body-strong mb-3">Description</h2>
+                <div className="type-caption-md text-[var(--color-charcoal)] whitespace-pre-line">
+                  {description}
+                </div>
+              </div>
+            )}
 
             <div className="mt-10">
               {["View Product Details", "Shipping & Returns", "Authenticity Guarantee"].map(

@@ -1,3 +1,4 @@
+import { inferBrandName } from "../brand-inference";
 import type {
   Brand,
   Cart,
@@ -28,6 +29,7 @@ export type ShopifyProduct = {
   vendor: string;
   tags: string[];
   description?: string;
+  descriptionHtml?: string;
   featuredImage?: { url: string; altText?: string | null } | null;
   images?: { nodes: Array<{ url: string; altText?: string | null }> };
   priceRange: {
@@ -168,13 +170,18 @@ export function mapShopifyProduct(product: ShopifyProduct): WatchProduct {
     id: product.id,
     title: product.title,
     handle: product.handle,
-    vendor: product.vendor,
+    vendor: inferBrandName({
+      title: product.title,
+      handle: product.handle,
+      vendor: product.vendor,
+      tags: product.tags,
+    }),
     tags: product.tags,
     price,
     currencyCode: primaryVariant?.currencyCode ?? product.priceRange.minVariantPrice.currencyCode,
     imageUrl: product.featuredImage?.url,
     images: product.images?.nodes.map((image) => image.url) ?? [],
-    description: product.description,
+    description: product.description || product.descriptionHtml,
     variantId: primaryVariant?.id,
     variants,
     metafields,

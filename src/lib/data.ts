@@ -1,4 +1,5 @@
 import { brandsFromProducts, mergeBrands, vendorToBrand } from "./brands";
+import { inferBrandHandle, withResolvedBrand } from "./brand-inference";
 import { mockBrands, mockProducts } from "./mock-data";
 import { isShopifyConfigured } from "./shopify/config";
 import {
@@ -15,23 +16,31 @@ export async function getBrands(): Promise<Brand[]> {
   if (!isShopifyConfigured()) return mockBrands;
 
   try {
-    const [metaBrands, products] = await Promise.all([fetchBrands(), fetchAllProducts()]);
+    const products = await getProducts();
+    const productBrandHandles = new Set(
+      products.map((product) => inferBrandHandle(product.vendor))
+    );
+
+    const catalogBrands = mockBrands.filter((brand) => productBrandHandles.has(brand.handle));
+    const [metaBrands] = await Promise.all([fetchBrands()]);
     const derived = brandsFromProducts(products);
-    const merged = mergeBrands(metaBrands, derived);
-    return merged.length ? merged : mockBrands;
+    const merged = mergeBrands(metaBrands, [...catalogBrands, ...derived]);
+
+    return merged.length ? merged : mockBrands.filter((brand) => productBrandHandles.has(brand.handle));
   } catch {
     return mockBrands;
   }
 }
 
 export async function getProducts(): Promise<WatchProduct[]> {
-  if (!isShopifyConfigured()) return mockProducts;
+  if (!isShopifyConfigured()) return mockProducts.map(withResolvedBrand);
 
   try {
     const products = await fetchAllProducts();
-    return products.length ? products : mockProducts;
+    const resolved = products.map(withResolvedBrand);
+    return resolved.length ? resolved : mockProducts.map(withResolvedBrand);
   } catch {
-    return mockProducts;
+    return mockProducts.map(withResolvedBrand);
   }
 }
 
@@ -42,7 +51,7 @@ export async function getProduct(handle: string): Promise<WatchProduct | undefin
 
   try {
     const product = await fetchProductByHandle(handle);
-    if (product) return product;
+    if (product) return withResolvedBrand(product);
   } catch {
     // fall through to mock data
   }
@@ -60,7 +69,14 @@ export async function getBrand(handle: string): Promise<Brand | undefined> {
 
 export async function getProductsByBrand(brandName: string): Promise<WatchProduct[]> {
   const products = await getProducts();
-  return products.filter((product) => product.vendor === brandName);
+  const brand = await getBrand(inferBrandHandle(brandName));
+  const targetHandle = brand?.handle ?? inferBrandHandle(brandName);
+  const targetName = brand?.name ?? brandName;
+
+  return products.filter(
+    (product) =>
+      product.vendor === targetName || inferBrandHandle(product.vendor) === targetHandle
+  );
 }
 
 function productMatchesCollection(handle: string, product: WatchProduct) {
@@ -89,7 +105,7 @@ function productMatchesCollection(handle: string, product: WatchProduct) {
     "limited-editions": (item) => item.tags.includes("limited"),
   };
 
-  const vendorMatch = slugify(product.vendor) === handle;
+  const vendorMatch = slugify(product.vendor) === handle || inferBrandHandle(product.vendor) === handle;
   if (vendorMatch) return true;
 
   const filter = filters[handle];
@@ -123,7 +139,10 @@ export async function getCollectionProducts(handle: string): Promise<{
   const brand = await getBrand(handle);
 
   if (brand) {
-    const brandProducts = products.filter((product) => product.vendor === brand.name);
+    const brandProducts = products.filter(
+      (product) =>
+        product.vendor === brand.name || inferBrandHandle(product.vendor) === brand.handle
+    );
     if (brandProducts.length > 0) {
       return {
         title: brand.name,

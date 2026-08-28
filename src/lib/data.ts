@@ -61,6 +61,15 @@ export async function getCollectionProducts(handle: string): Promise<{
   description: string;
   products: WatchProduct[];
 } | null> {
+  if (handle === "all") {
+    const products = await getProducts();
+    return {
+      title: "All Watches",
+      description: "Browse our complete catalog.",
+      products,
+    };
+  }
+
   if (isShopifyConfigured()) {
     try {
       const collection = await fetchCollectionByHandle(handle);
@@ -82,6 +91,7 @@ export async function getCollectionProducts(handle: string): Promise<{
   }
 
   const filters: Record<string, (product: WatchProduct) => boolean> = {
+    all: () => true,
     "tissot-prx": (product) => product.metafields.line === "prx",
     "mens-watches": (product) =>
       ["men", "unisex"].includes(product.metafields.gender),
@@ -101,6 +111,7 @@ export async function getCollectionProducts(handle: string): Promise<{
   if (!filter) return null;
 
   const titles: Record<string, string> = {
+    all: "All Watches",
     "tissot-prx": "Tissot PRX",
     "mens-watches": "Men's Watches",
     "womens-watches": "Women's Watches",

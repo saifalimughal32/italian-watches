@@ -4,6 +4,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WatchCard } from "@/components/WatchCard";
 import { getBrands, getProducts } from "@/lib/data";
 
+export const revalidate = 60;
+
 const categories = [
   { title: "Men's", href: "/collections/mens-watches" },
   { title: "Women's", href: "/collections/womens-watches" },
@@ -15,10 +17,22 @@ const categories = [
 
 export default async function HomePage() {
   const [brands, products] = await Promise.all([getBrands(), getProducts()]);
-  const featured = products.filter((p) => p.tags.includes("featured"));
-  const newArrivals = products.filter((p) => p.tags.includes("new"));
-  const bestSellers = products.filter((p) => p.tags.includes("bestseller"));
-  const prx = products.filter((p) => p.metafields.line === "prx");
+  const featured =
+    products.filter((p) => p.tags.includes("featured")).length > 0
+      ? products.filter((p) => p.tags.includes("featured"))
+      : products.slice(0, 8);
+  const newArrivals =
+    products.filter((p) => p.tags.includes("new")).length > 0
+      ? products.filter((p) => p.tags.includes("new"))
+      : products.slice(0, 4);
+  const bestSellers =
+    products.filter((p) => p.tags.includes("bestseller")).length > 0
+      ? products.filter((p) => p.tags.includes("bestseller"))
+      : products.slice(4, 12);
+  const prx =
+    products.filter((p) => p.metafields.line === "prx").length > 0
+      ? products.filter((p) => p.metafields.line === "prx")
+      : products.slice(0, 3);
 
   return (
     <>
@@ -60,7 +74,11 @@ export default async function HomePage() {
           tagline="Since 1972, the icon that redefined luxury sports watches."
           href="/collections/audemars-piguet"
           cta="Explore AP"
-          products={products.filter((p) => p.vendor === "Audemars Piguet")}
+          products={
+            products.filter((p) => p.vendor === "Audemars Piguet").length > 0
+              ? products.filter((p) => p.vendor === "Audemars Piguet")
+              : products.slice(0, 4)
+          }
         />
       </section>
 

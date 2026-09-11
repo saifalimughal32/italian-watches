@@ -46,7 +46,7 @@ export function Header() {
         className="sticky top-0 z-50 sticky-subnav"
         style={{ background: "var(--color-canvas)" }}
       >
-        <div className="container-nike flex items-center justify-between h-14 md:h-16 gap-4">
+        <div className="container-nike flex items-center justify-between h-14 md:h-16 gap-2 md:gap-4 min-w-0">
           <Link href="/" className="type-body-strong shrink-0 tracking-tight text-sm md:text-base">
             ITALIAN WATCHES
           </Link>
@@ -64,9 +64,7 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3 md:gap-4">
-            <HeaderActions />
-          </div>
+          <HeaderActions />
         </div>
       </div>
     </header>

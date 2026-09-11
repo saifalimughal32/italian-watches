@@ -1,5 +1,7 @@
 export type PurchaseMode = "checkout" | "enquiry";
 
+export type WatchTier = "haute" | "luxury" | "premium";
+
 export interface ProductVariant {
   id: string;
   title: string;
@@ -21,8 +23,13 @@ export interface WatchMetafields {
   water_resistance: string;
   strap_type: string;
   power_reserve: string;
-  tier: "luxury" | "premium";
+  tier: WatchTier;
   purchase_mode: PurchaseMode;
+  is_limited: boolean;
+  box_papers: string;
+  year_of_production: number | null;
+  condition: string;
+  service_history: string;
 }
 
 export interface WatchProduct {
@@ -52,6 +59,51 @@ export interface Brand {
   collection_handle: string;
   logo?: string;
   collectionImage?: string;
+  founded_year?: number;
+}
+
+export interface HomepageSlot {
+  kind: string;
+  heading: string;
+  subheading: string;
+  image: string;
+  cta_label: string;
+  cta_href: string;
+  order: number;
+  founded_year?: number;
+  heritage?: string;
+}
+
+export interface JournalArticle {
+  title: string;
+  slug: string;
+  hero: string;
+  excerpt: string;
+  author: string;
+  published_at: string;
+  body_richtext?: string;
+  related_product_ids?: string[];
+}
+
+export interface Campaign {
+  handle: string;
+  title: string;
+  hero_video?: string;
+  hero_still: string;
+  story_richtext?: string;
+  featured_product_ids: string[];
+  start?: string;
+  end?: string;
+}
+
+export interface Specialist {
+  handle: string;
+  name: string;
+  title: string;
+  photo?: string;
+  whatsapp?: string;
+  email?: string;
+  brands_covered: string[];
 }
 
 export interface CartLine {

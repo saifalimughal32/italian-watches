@@ -1,0 +1,92 @@
+/* PDP Phase 3 — gallery, lightbox, sticky ATC */
+
+.pdp-page {
+  background: var(--color-canvas);
+}
+
+.pdp-sticky-atc {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  background: color-mix(in srgb, var(--color-canvas) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--color-hairline);
+  padding: 12px clamp(16px, 5vw, 80px);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.pdp-sticky-atc__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.pdp-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+}
+
+.pdp-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(11, 11, 12, 0.92);
+  cursor: pointer;
+}
+
+.pdp-lightbox__stage {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 1100px);
+  height: min(82vh, 900px);
+}
+
+.pdp-lightbox__close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  color: var(--color-canvas);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pdp-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(247, 245, 241, 0.35);
+  background: transparent;
+  color: var(--color-canvas);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pdp-lightbox__nav--prev {
+  left: 16px;
+}
+
+.pdp-lightbox__nav--next {
+  right: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp-gallery__main img {
+    transition: none !important;
+  }
+}

@@ -35,6 +35,25 @@ export const PRODUCT_FRAGMENT = `
       }
     }
     metafields(identifiers: [
+      { namespace: "watches", key: "line" },
+      { namespace: "watches", key: "reference_number" },
+      { namespace: "watches", key: "gender" },
+      { namespace: "watches", key: "movement" },
+      { namespace: "watches", key: "is_chronograph" },
+      { namespace: "watches", key: "case_size_mm" },
+      { namespace: "watches", key: "case_material" },
+      { namespace: "watches", key: "dial_color" },
+      { namespace: "watches", key: "crystal" },
+      { namespace: "watches", key: "water_resistance" },
+      { namespace: "watches", key: "strap_type" },
+      { namespace: "watches", key: "power_reserve" },
+      { namespace: "watches", key: "tier" },
+      { namespace: "watches", key: "purchase_mode" },
+      { namespace: "watches", key: "is_limited" },
+      { namespace: "watches", key: "box_papers" },
+      { namespace: "watches", key: "year_of_production" },
+      { namespace: "watches", key: "condition" },
+      { namespace: "watches", key: "service_history" },
       { namespace: "custom", key: "line" },
       { namespace: "custom", key: "reference_number" },
       { namespace: "custom", key: "gender" },
@@ -48,7 +67,13 @@ export const PRODUCT_FRAGMENT = `
       { namespace: "custom", key: "strap_type" },
       { namespace: "custom", key: "power_reserve" },
       { namespace: "custom", key: "tier" },
-      { namespace: "custom", key: "purchase_mode" }
+      { namespace: "custom", key: "purchase_mode" },
+      { namespace: "custom", key: "is_limited" },
+      { namespace: "custom", key: "box_papers" },
+      { namespace: "custom", key: "year_of_production" },
+      { namespace: "custom", key: "year_or_generation" },
+      { namespace: "custom", key: "condition" },
+      { namespace: "custom", key: "service_history" }
     ]) {
       key
       value

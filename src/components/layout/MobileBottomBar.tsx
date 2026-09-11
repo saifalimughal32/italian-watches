@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/", label: "Home", icon: "home" },
@@ -11,6 +12,11 @@ const links = [
 ];
 
 export function MobileBottomBar() {
+  const pathname = usePathname();
+  const hideOnPdp = pathname?.startsWith("/products/");
+
+  if (hideOnPdp) return null;
+
   return (
     <nav
       className="fixed bottom-0 inset-x-0 z-40 md:hidden"

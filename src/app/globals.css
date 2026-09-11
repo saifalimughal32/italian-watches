@@ -292,6 +292,15 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+/* Crop studio padding so the watch fills the frame edge-to-edge */
+.product-image-fit {
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.28);
+  transform-origin: center center;
 }
 
 /* Campaign tile */

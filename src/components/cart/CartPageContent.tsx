@@ -54,7 +54,7 @@ export function CartPageContent() {
                 className="w-24 h-24 product-card-image relative overflow-hidden shrink-0"
               >
                 {line.imageUrl ? (
-                  <Image src={line.imageUrl} alt={line.title} fill sizes="96px" className="object-cover" />
+                  <Image src={line.imageUrl} alt={line.title} fill sizes="96px" className="object-cover product-image-fit" />
                 ) : null}
               </Link>
               <div className="flex-1 min-w-0">

@@ -49,7 +49,7 @@ export function WatchCard({ product }: { product: WatchProduct }) {
             alt={product.title}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover"
+            className="object-cover product-image-fit"
           />
         ) : (
           <span className="type-caption-sm text-[var(--color-stone)] uppercase tracking-wide">

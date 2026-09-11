@@ -78,7 +78,9 @@ export function ProductGallery({
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover transition-opacity duration-500 ease-out"
           style={{
-            transform: zoom.on ? "scale(1.75)" : "scale(1)",
+            // 1.28 crops padded studio shots so the watch fills the frame;
+            // hover zoom builds on top of that fit scale.
+            transform: zoom.on ? "scale(2.2)" : "scale(1.28)",
             transformOrigin: `${zoom.x}% ${zoom.y}%`,
             transition: zoom.on
               ? "transform 80ms linear"
@@ -103,7 +105,7 @@ export function ProductGallery({
               aria-label={`View image ${index + 1}`}
               aria-current={index === active}
             >
-              <Image src={image} alt="" fill sizes="64px" className="object-cover" />
+              <Image src={image} alt="" fill sizes="64px" className="object-cover product-image-fit" />
             </button>
           ))}
         </div>

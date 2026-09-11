@@ -496,7 +496,7 @@ a {
   justify-content: center;
   min-height: 36px;
   padding: 8px 16px;
-  background: var(--color-soft-cloud);
+  background: #000000;
   text-align: center;
 }
 
@@ -504,7 +504,7 @@ a {
   font-size: var(--text-caption-sm);
   font-weight: 500;
   line-height: 1.4;
-  color: var(--color-ink);
+  color: var(--color-on-primary);
   letter-spacing: 0.01em;
   max-width: 100%;
 }

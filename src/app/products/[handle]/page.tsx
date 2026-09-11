@@ -13,7 +13,7 @@ import { getProduct, getProductsByBrand } from "@/lib/data";
 import { inferBrandHandle } from "@/lib/brand-inference";
 import { formatDescriptionForDisplay } from "@/lib/parse-specs";
 import { getProductGallery } from "@/lib/product-display";
-import "./pdp.css";
+import "../pdp.css";
 
 export async function generateMetadata({
   params,

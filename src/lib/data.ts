@@ -24,6 +24,36 @@ import type {
 } from "./types";
 import { slugify } from "./utils";
 
+/** Exclude Shopify service/add-on SKUs (Route, shipping insurance, etc.). */
+export function isWatchCatalogProduct(
+  product: Pick<WatchProduct, "title" | "handle" | "vendor" | "tags">
+) {
+  const text = [
+    product.title,
+    product.handle,
+    product.vendor,
+    ...(product.tags ?? []),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const blocked = [
+    "shipping protection",
+    "package protection",
+    "order protection",
+    "route protection",
+    "shipping-protection",
+    "package-protection",
+    "order-protection",
+  ];
+
+  return !blocked.some((term) => text.includes(term));
+}
+
+function onlyWatches(products: WatchProduct[]) {
+  return products.filter(isWatchCatalogProduct);
+}
+
 export async function getBrands(): Promise<Brand[]> {
   if (!isShopifyConfigured()) return mockBrands;
 
@@ -45,30 +75,37 @@ export async function getBrands(): Promise<Brand[]> {
 }
 
 export async function getProducts(): Promise<WatchProduct[]> {
-  if (!isShopifyConfigured()) return mockProducts.map(withResolvedBrand);
+  if (!isShopifyConfigured()) return onlyWatches(mockProducts.map(withResolvedBrand));
 
   try {
     const products = await fetchAllProducts();
-    const resolved = products.map(withResolvedBrand);
-    return resolved.length ? resolved : mockProducts.map(withResolvedBrand);
+    const resolved = onlyWatches(products.map(withResolvedBrand));
+    return resolved.length ? resolved : onlyWatches(mockProducts.map(withResolvedBrand));
   } catch {
-    return mockProducts.map(withResolvedBrand);
+    return onlyWatches(mockProducts.map(withResolvedBrand));
   }
 }
 
 export async function getProduct(handle: string): Promise<WatchProduct | undefined> {
   if (!isShopifyConfigured()) {
-    return mockProducts.find((product) => product.handle === handle);
+    return onlyWatches(
+      mockProducts.filter((product) => product.handle === handle).map(withResolvedBrand)
+    )[0];
   }
 
   try {
     const product = await fetchProductByHandle(handle);
-    if (product) return withResolvedBrand(product);
+    if (product) {
+      const resolved = withResolvedBrand(product);
+      return isWatchCatalogProduct(resolved) ? resolved : undefined;
+    }
   } catch {
     // fall through to mock data
   }
 
-  return mockProducts.find((product) => product.handle === handle);
+  return onlyWatches(
+    mockProducts.filter((product) => product.handle === handle).map(withResolvedBrand)
+  )[0];
 }
 
 export async function getBrand(handle: string): Promise<Brand | undefined> {
@@ -145,7 +182,12 @@ export async function getCollectionProducts(handle: string): Promise<{
   if (isShopifyConfigured()) {
     try {
       const collection = await fetchCollectionByHandle(handle);
-      if (collection && collection.products.length > 0) return collection;
+      if (collection && collection.products.length > 0) {
+        return {
+          ...collection,
+          products: onlyWatches(collection.products),
+        };
+      }
     } catch {
       // fall through
     }
@@ -213,7 +255,7 @@ export async function searchCatalog(query: string): Promise<WatchProduct[]> {
 
   if (isShopifyConfigured()) {
     try {
-      const results = await searchProducts(query);
+      const results = onlyWatches(await searchProducts(query));
       if (results.length) return results;
     } catch {
       // fall through

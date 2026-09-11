@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { HeaderActions } from "@/components/layout/HeaderActions";
 
-const primaryNav = [
-  { label: "New & Featured", href: "/collections/new-arrivals" },
+const primaryNav: Array<{ label: string; href: string; badge?: string }> = [
+  { label: "New & Featured", href: "/collections/new-arrivals", badge: "New" },
   { label: "Brands", href: "/brands" },
   { label: "Men", href: "/collections/mens-watches" },
   { label: "Women", href: "/collections/womens-watches" },
@@ -13,14 +13,19 @@ const primaryNav = [
 export function Header() {
   return (
     <header>
+      {/* announcement-bar */}
+      <div className="announcement-bar">
+        <p>
+          Free insured shipping across Pakistan on orders over Rs 50,000 · Authenticity guaranteed
+        </p>
+      </div>
+
       {/* utility-bar */}
       <div
         className="flex items-center justify-end h-9 px-4 md:px-10"
         style={{ background: "#000000" }}
       >
         <div className="type-caption-sm flex gap-4 text-[var(--color-on-primary)]">
-          <Link href="/contact">Private Client</Link>
-          <span className="text-[var(--color-stone)]">·</span>
           <Link href="/faq">Help</Link>
           <span className="hidden sm:inline text-[var(--color-stone)]">·</span>
           <Link href="/contact" className="hidden sm:inline">
@@ -46,8 +51,9 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="type-body-strong text-[var(--color-ink)] hover:opacity-70"
+                className="nav-item-with-badge type-body-strong text-[var(--color-ink)] hover:opacity-70"
               >
+                {item.badge ? <span className="nav-item-badge">{item.badge}</span> : null}
                 {item.label}
               </Link>
             ))}

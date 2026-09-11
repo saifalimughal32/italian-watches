@@ -38,7 +38,7 @@ export function CartPageContent() {
     (sum, line) => sum + parseFloat(line.price) * line.quantity,
     0
   );
-  const currencyCode = cart.lines[0]?.currencyCode ?? "USD";
+  const currencyCode = cart.lines[0]?.currencyCode ?? "PKR";
 
   return (
     <Container>
@@ -99,9 +99,10 @@ export function CartPageContent() {
           <div>
             <p className="type-caption-sm uppercase text-[var(--color-mute)]">Subtotal</p>
             <p className="type-heading-lg">
-              {new Intl.NumberFormat("en-US", {
+              {new Intl.NumberFormat("en-PK", {
                 style: "currency",
                 currency: currencyCode,
+                maximumFractionDigits: 0,
               }).format(subtotal)}
             </p>
           </div>

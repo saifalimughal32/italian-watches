@@ -78,6 +78,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
           localStorage.setItem(CART_STORAGE_KEY, nextCart.id);
           setCart(nextCart);
         }
+      } catch (error) {
+        // Clear stale cart ids that cause repeated failures
+        if (
+          error instanceof Error &&
+          /cart|not found|invalid/i.test(error.message)
+        ) {
+          localStorage.removeItem(CART_STORAGE_KEY);
+        }
+        throw error;
       } finally {
         setLoading(false);
       }

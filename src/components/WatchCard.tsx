@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WatchProduct } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
-import { getProductDisplay } from "@/lib/product-display";
+import { getProductDisplay, getProductImage } from "@/lib/product-display";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 
 const swatchColors: Record<string, string> = {
@@ -21,6 +21,7 @@ export function WatchCard({ product }: { product: WatchProduct }) {
   const isEnquiry = metafields.purchase_mode === "enquiry";
   const swatchColor = swatchColors[metafields.dial_color] || swatchColors.steel;
   const { modelName, subtitle } = getProductDisplay(product);
+  const imageUrl = getProductImage(product);
 
   return (
     <div className="product-card group relative">
@@ -42,9 +43,9 @@ export function WatchCard({ product }: { product: WatchProduct }) {
         {isEnquiry && !isNew && (
           <span className="badge-promo absolute top-3 left-3 z-10">By Request</span>
         )}
-        {product.imageUrl ? (
+        {imageUrl ? (
           <Image
-            src={product.imageUrl}
+            src={imageUrl}
             alt={product.title}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"

@@ -10,12 +10,12 @@ export const BRAND_COLLECTION_IMAGES: Record<string, string> = {
 };
 
 export const CATEGORY_COLLECTION_IMAGES: Record<string, string> = {
-  "mens-watches": "/categories/mens.jpg",
-  "womens-watches": "/categories/womens.jpg",
-  "automatic-watches": "/categories/automatic.jpg",
-  "chronograph-watches": "/categories/chronograph.jpg",
-  "luxury-watches": "/categories/luxury.jpg",
-  "premium-watches": "/categories/premium.jpg",
+  "mens-watches": "/categories/mens-premium.jpg",
+  "womens-watches": "/categories/womens-premium.jpg",
+  "automatic-watches": "/categories/automatic-premium.jpg",
+  "chronograph-watches": "/categories/chronograph-premium.jpg",
+  "luxury-watches": "/categories/luxury-haute.jpg",
+  "premium-watches": "/categories/premium-premium.jpg",
 };
 
 export function getBrandCollectionImage(brand: Brand, products: WatchProduct[] = []) {

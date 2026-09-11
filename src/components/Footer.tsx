@@ -66,7 +66,7 @@ export function Footer() {
           <div className="type-utility-xs flex gap-4">
             <Link href="/about">Terms</Link>
             <Link href="/about">Privacy</Link>
-            <span>United States</span>
+            <span>Pakistan</span>
           </div>
         </div>
       </div>

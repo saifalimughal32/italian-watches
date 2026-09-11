@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WatchProduct } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
-import { getProductDisplay } from "@/lib/product-display";
+import { getProductDisplay, getProductImage } from "@/lib/product-display";
 
 export function EditorialBrandSection({
   lines,
@@ -66,6 +66,7 @@ export function EditorialBrandSection({
 function ProductSpotlight({ product }: { product: WatchProduct }) {
   const { modelName, subtitle, reference } = getProductDisplay(product);
   const isEnquiry = product.metafields.purchase_mode === "enquiry";
+  const imageUrl = getProductImage(product);
 
   return (
     <Link
@@ -76,9 +77,9 @@ function ProductSpotlight({ product }: { product: WatchProduct }) {
         {isEnquiry && (
           <span className="badge-promo absolute top-3 left-3 z-10">By Request</span>
         )}
-        {product.imageUrl ? (
+        {imageUrl ? (
           <Image
-            src={product.imageUrl}
+            src={imageUrl}
             alt={product.title}
             fill
             sizes="(max-width: 640px) 100vw, 33vw"

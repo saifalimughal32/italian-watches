@@ -1,7 +1,22 @@
 import { shopifyFetch } from "./client";
-import { mapShopifyBrand, mapShopifyProduct, type ShopifyProduct } from "./mappers";
+import {
+  mapCampaign,
+  mapHomepageSlot,
+  mapJournalArticle,
+  mapShopifyBrand,
+  mapShopifyProduct,
+  mapSpecialist,
+  type ShopifyProduct,
+} from "./mappers";
 import { PRODUCT_FRAGMENT } from "./fragments";
-import type { Brand, WatchProduct } from "../types";
+import type {
+  Brand,
+  Campaign,
+  HomepageSlot,
+  JournalArticle,
+  Specialist,
+  WatchProduct,
+} from "../types";
 
 const PAGE_SIZE = 250;
 const MAX_PAGES = 40;
@@ -63,6 +78,79 @@ const GET_BRANDS = `
     }
   }
 `;
+
+const GET_HOMEPAGE_SLOTS = `
+  query GetHomepageSlots($first: Int!) {
+    metaobjects(type: "homepage_slot", first: $first) {
+      nodes {
+        handle
+        fields {
+          key
+          value
+        }
+      }
+    }
+  }
+`;
+
+const GET_JOURNAL_ARTICLES = `
+  query GetJournalArticles($first: Int!) {
+    metaobjects(type: "journal_article", first: $first) {
+      nodes {
+        handle
+        fields {
+          key
+          value
+        }
+      }
+    }
+  }
+`;
+
+const GET_CAMPAIGNS = `
+  query GetCampaigns($first: Int!) {
+    metaobjects(type: "campaign", first: $first) {
+      nodes {
+        handle
+        fields {
+          key
+          value
+        }
+      }
+    }
+  }
+`;
+
+const GET_CAMPAIGN_BY_HANDLE = `
+  query GetCampaignByHandle($handle: String!) {
+    metaobject(handle: { type: "campaign", handle: $handle }) {
+      handle
+      fields {
+        key
+        value
+      }
+    }
+  }
+`;
+
+const GET_SPECIALISTS = `
+  query GetSpecialists($first: Int!) {
+    metaobjects(type: "specialist", first: $first) {
+      nodes {
+        handle
+        fields {
+          key
+          value
+        }
+      }
+    }
+  }
+`;
+
+type MetaobjectNode = {
+  handle: string;
+  fields: Array<{ key: string; value: string }>;
+};
 
 type ProductPage = {
   products: {
@@ -160,14 +248,63 @@ export async function fetchCollectionByHandle(handle: string): Promise<{
 export async function fetchBrands(): Promise<Brand[]> {
   const data = await shopifyFetch<{
     metaobjects: {
-      nodes: Array<{
-        handle: string;
-        fields: Array<{ key: string; value: string }>;
-      }>;
+      nodes: MetaobjectNode[];
     };
   }>(GET_BRANDS, { first: 50 });
 
   return data.metaobjects.nodes.map(mapShopifyBrand);
+}
+
+export async function fetchHomepageSlots(): Promise<HomepageSlot[]> {
+  const data = await shopifyFetch<{
+    metaobjects: {
+      nodes: MetaobjectNode[];
+    };
+  }>(GET_HOMEPAGE_SLOTS, { first: 20 });
+
+  return data.metaobjects.nodes
+    .map(mapHomepageSlot)
+    .sort((a, b) => a.order - b.order);
+}
+
+export async function fetchJournalArticles(): Promise<JournalArticle[]> {
+  const data = await shopifyFetch<{
+    metaobjects: {
+      nodes: MetaobjectNode[];
+    };
+  }>(GET_JOURNAL_ARTICLES, { first: 12 });
+
+  return data.metaobjects.nodes
+    .map(mapJournalArticle)
+    .sort((a, b) => (a.published_at < b.published_at ? 1 : -1));
+}
+
+export async function fetchCampaigns(): Promise<Campaign[]> {
+  const data = await shopifyFetch<{
+    metaobjects: {
+      nodes: MetaobjectNode[];
+    };
+  }>(GET_CAMPAIGNS, { first: 20 });
+
+  return data.metaobjects.nodes.map(mapCampaign);
+}
+
+export async function fetchCampaignByHandle(handle: string): Promise<Campaign | null> {
+  const data = await shopifyFetch<{
+    metaobject: MetaobjectNode | null;
+  }>(GET_CAMPAIGN_BY_HANDLE, { handle });
+
+  return data.metaobject ? mapCampaign(data.metaobject) : null;
+}
+
+export async function fetchSpecialists(): Promise<Specialist[]> {
+  const data = await shopifyFetch<{
+    metaobjects: {
+      nodes: MetaobjectNode[];
+    };
+  }>(GET_SPECIALISTS, { first: 20 });
+
+  return data.metaobjects.nodes.map(mapSpecialist);
 }
 
 export async function searchProducts(query: string): Promise<WatchProduct[]> {

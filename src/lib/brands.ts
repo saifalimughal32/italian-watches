@@ -17,10 +17,10 @@ export function vendorToBrand(vendor: string): Brand {
   const words = vendor.trim().split(/\s+/);
   const displayLines =
     words.length <= 1
-      ? [vendor.toUpperCase()]
+      ? [vendor]
       : [
-          words.slice(0, Math.ceil(words.length / 2)).join(" ").toUpperCase(),
-          words.slice(Math.ceil(words.length / 2)).join(" ").toUpperCase(),
+          words.slice(0, Math.ceil(words.length / 2)).join(" "),
+          words.slice(Math.ceil(words.length / 2)).join(" "),
         ];
 
   return {

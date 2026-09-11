@@ -7,7 +7,7 @@ export default function ShippingPage() {
         Orders are dispatched within 1–2 business days after payment confirmation. All shipments are fully insured and require signature on delivery.
       </p>
       <p>
-        <strong>Domestic (United States):</strong> 2–5 business days via express courier.
+        <strong>Domestic (Pakistan):</strong> 2–5 business days via express courier.
       </p>
       <p>
         <strong>International:</strong> 5–10 business days depending on destination. Import duties and taxes may apply and are the responsibility of the recipient.

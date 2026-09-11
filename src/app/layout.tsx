@@ -1,4 +1,4 @@
-import { Bebas_Neue, Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -6,15 +6,17 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
 import "./globals.css";
 
-const bebas = Bebas_Neue({
-  weight: "400",
+const playfair = Playfair_Display({
+  weight: ["400", "500"],
   subsets: ["latin"],
-  variable: "--font-bebas",
+  variable: "--font-playfair",
+  display: "swap",
 });
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${bebas.variable} ${inter.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body className="antialiased pb-14 md:pb-0">
         <AppProviders>
           <Header />

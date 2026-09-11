@@ -95,7 +95,7 @@ export function CategoryTile({
         alt={title}
         fill
         sizes="(max-width: 768px) 33vw, 16vw"
-        className="object-cover transition-transform duration-700 group-hover:scale-105"
+        className="object-cover object-[center_38%] transition-transform duration-700 group-hover:scale-105"
       />
       <div className="category-tile__overlay" />
       <span className="category-tile__label">{title}</span>

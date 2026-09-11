@@ -31,7 +31,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!isShopifyConfigured()) {
-    return NextResponse.json({ error: "Shopify not configured" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error:
+          "Cart requires Shopify. Use the live Vercel site, or add Storefront API env vars locally.",
+      },
+      { status: 400 }
+    );
   }
 
   try {

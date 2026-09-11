@@ -1,15 +1,27 @@
 import { brandsFromProducts, mergeBrands, vendorToBrand } from "./brands";
 import { inferBrandHandle, withResolvedBrand } from "./brand-inference";
-import { mockBrands, mockProducts } from "./mock-data";
+import { mockBrands, mockHomepageSlots, mockJournalArticles, mockProducts } from "./mock-data";
 import { isShopifyConfigured } from "./shopify/config";
 import {
   fetchAllProducts,
   fetchBrands,
+  fetchCampaignByHandle,
+  fetchCampaigns,
   fetchCollectionByHandle,
+  fetchHomepageSlots,
+  fetchJournalArticles,
   fetchProductByHandle,
+  fetchSpecialists,
   searchProducts,
 } from "./shopify/queries";
-import type { Brand, WatchProduct } from "./types";
+import type {
+  Brand,
+  Campaign,
+  HomepageSlot,
+  JournalArticle,
+  Specialist,
+  WatchProduct,
+} from "./types";
 import { slugify } from "./utils";
 
 export async function getBrands(): Promise<Brand[]> {
@@ -98,11 +110,15 @@ function productMatchesCollection(handle: string, product: WatchProduct) {
       item.metafields.is_chronograph ||
       item.metafields.movement === "chronograph" ||
       item.title.toLowerCase().includes("chronograph"),
-    "luxury-watches": (item) => item.metafields.tier === "luxury" || price >= 50000,
+    "luxury-watches": (item) =>
+      item.metafields.tier === "luxury" ||
+      item.metafields.tier === "haute" ||
+      price >= 50000,
     "premium-watches": (item) => item.metafields.tier === "premium" || price < 50000,
     "new-arrivals": (item) => item.tags.includes("new"),
     "best-sellers": (item) => item.tags.includes("bestseller"),
-    "limited-editions": (item) => item.tags.includes("limited"),
+    "limited-editions": (item) =>
+      item.metafields.is_limited || item.tags.includes("limited"),
   };
 
   const vendorMatch = slugify(product.vendor) === handle || inferBrandHandle(product.vendor) === handle;
@@ -216,19 +232,93 @@ export async function searchCatalog(query: string): Promise<WatchProduct[]> {
   );
 }
 
+export async function getHomepageSlots(): Promise<HomepageSlot[]> {
+  if (!isShopifyConfigured()) return mockHomepageSlots;
+
+  try {
+    const slots = await fetchHomepageSlots();
+    return slots.length ? slots : mockHomepageSlots;
+  } catch {
+    return mockHomepageSlots;
+  }
+}
+
+export async function getJournalArticles(): Promise<JournalArticle[]> {
+  if (!isShopifyConfigured()) return mockJournalArticles;
+
+  try {
+    const articles = await fetchJournalArticles();
+    return articles.length ? articles : mockJournalArticles;
+  } catch {
+    return mockJournalArticles;
+  }
+}
+
+export async function getBrandChapterSlot(
+  brands: Brand[]
+): Promise<HomepageSlot> {
+  const slots = await getHomepageSlots();
+  const chapter = slots.find((slot) => slot.kind === "brand_chapter");
+  if (chapter) return chapter;
+
+  const brand = brands.find((item) => item.tier === "haute") ?? brands[0] ?? mockBrands[0];
+  return {
+    kind: "brand_chapter",
+    heading: brand.name,
+    subheading: brand.tagline,
+    image: brand.collectionImage ?? "/images/hero.jpg",
+    cta_label: `Explore ${brand.name}`,
+    cta_href: `/collections/${brand.collection_handle}`,
+    order: 1,
+    founded_year: brand.founded_year,
+    heritage: brand.heritage,
+  };
+}
+
 export function formatPrice(
   price: string,
   purchaseMode: string,
-  currencyCode = "USD"
+  currencyCode = "PKR"
 ) {
   if (purchaseMode === "enquiry" || parseFloat(price) === 0) {
     return "Price on request";
   }
 
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-PK", {
     style: "currency",
     currency: currencyCode,
+    maximumFractionDigits: 0,
   }).format(parseFloat(price));
 }
 
-export type { Brand, WatchProduct };
+export async function getCampaigns(): Promise<Campaign[]> {
+  if (!isShopifyConfigured()) return [];
+
+  try {
+    return await fetchCampaigns();
+  } catch {
+    return [];
+  }
+}
+
+export async function getCampaign(handle: string): Promise<Campaign | null> {
+  if (!isShopifyConfigured()) return null;
+
+  try {
+    return await fetchCampaignByHandle(handle);
+  } catch {
+    return null;
+  }
+}
+
+export async function getSpecialists(): Promise<Specialist[]> {
+  if (!isShopifyConfigured()) return [];
+
+  try {
+    return await fetchSpecialists();
+  } catch {
+    return [];
+  }
+}
+
+export type { Brand, Campaign, HomepageSlot, JournalArticle, Specialist, WatchProduct };

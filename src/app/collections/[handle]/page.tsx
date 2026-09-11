@@ -58,7 +58,7 @@ export default async function CollectionPage({
             </p>
           )}
 
-          <div className="flex flex-wrap gap-2 mt-8 mb-10">
+          <div className="mobile-scroll-x md:flex md:flex-wrap md:gap-2 md:mx-0 md:px-0 mt-8 mb-10">
             {brands.map((b) => (
               <FilterChip
                 key={b.handle}

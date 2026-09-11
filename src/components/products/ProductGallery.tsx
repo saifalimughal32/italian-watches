@@ -56,9 +56,14 @@ export function ProductGallery({
         type="button"
         className="pdp-gallery__main product-card-image aspect-square relative overflow-hidden w-full border-0 p-0 cursor-zoom-in bg-[var(--color-soft-cloud)]"
         onClick={() => setLightbox(true)}
-        onMouseEnter={() => setZoom((z) => ({ ...z, on: true }))}
+        onMouseEnter={() => {
+          if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            setZoom((z) => ({ ...z, on: true }));
+          }
+        }}
         onMouseLeave={() => setZoom((z) => ({ ...z, on: false }))}
         onMouseMove={(event) => {
+          if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
           const rect = event.currentTarget.getBoundingClientRect();
           const x = ((event.clientX - rect.left) / rect.width) * 100;
           const y = ((event.clientY - rect.top) / rect.height) * 100;

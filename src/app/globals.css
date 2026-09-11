@@ -42,6 +42,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   font-family: var(--font-ui);
   font-size: 16px;
@@ -50,6 +54,19 @@ body {
   color: var(--color-ink);
   background: var(--color-canvas);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+}
+
+img,
+video {
+  max-width: 100%;
 }
 
 a {
@@ -80,7 +97,7 @@ a {
 
 .type-heading-xl {
   font-family: var(--font-display);
-  font-size: var(--text-heading-xl);
+  font-size: clamp(22px, 5.5vw, var(--text-heading-xl));
   font-weight: 500;
   line-height: 1.2;
   text-transform: none;
@@ -89,7 +106,7 @@ a {
 
 .type-heading-lg {
   font-family: var(--font-display);
-  font-size: var(--text-heading-lg);
+  font-size: clamp(18px, 4.5vw, var(--text-heading-lg));
   font-weight: 500;
   line-height: 1.25;
 }
@@ -149,7 +166,7 @@ a {
 }
 
 .section-rhythm {
-  padding-block: var(--spacing-section);
+  padding-block: clamp(32px, 6vw, var(--spacing-section));
 }
 
 /* Buttons */
@@ -480,6 +497,34 @@ a {
   line-height: 1.4;
   color: var(--color-ink);
   letter-spacing: 0.01em;
+  max-width: 100%;
+}
+
+.announcement-bar__mobile {
+  display: none;
+}
+
+.announcement-bar__desktop {
+  display: inline;
+}
+
+@media (max-width: 640px) {
+  .announcement-bar {
+    min-height: 32px;
+    padding: 6px 12px;
+  }
+
+  .announcement-bar p {
+    font-size: 11px;
+  }
+
+  .announcement-bar__mobile {
+    display: inline;
+  }
+
+  .announcement-bar__desktop {
+    display: none;
+  }
 }
 
 /* Nav item NEW badge (Nike-style top label) */
@@ -1000,4 +1045,201 @@ a {
   .section-rhythm {
     padding-block: 96px;
   }
+}
+
+/* ── Mobile responsiveness pass ── */
+@media (max-width: 767px) {
+  .type-display-campaign {
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  .type-brand-lockup {
+    font-size: clamp(28px, 8vw, 40px);
+  }
+
+  .container-nike {
+    padding-inline: 16px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    min-height: 48px;
+    padding-inline: 20px;
+  }
+
+  .newsletter__form .btn-primary,
+  .brand-chapter__cta .btn-primary,
+  .cinematic-hero__cta .btn-primary {
+    width: 100%;
+  }
+
+  .btn-outline-on-image {
+    height: 36px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .brand-editorial-tile__content {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .brand-editorial-tile__title {
+    font-size: clamp(18px, 5.5vw, 24px);
+  }
+
+  .brand-editorial-tile__tagline {
+    display: none;
+  }
+
+  .brand-compact-tile__content {
+    padding: 12px;
+  }
+
+  .category-tile__label {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    font-size: 11px;
+  }
+
+  .cinematic-hero {
+    min-height: min(78svh, 640px);
+  }
+
+  .cinematic-hero__content {
+    padding: 40px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .cinematic-hero__brand {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .cinematic-hero__line {
+    max-width: 11ch;
+  }
+
+  .cinematic-hero__support {
+    margin-top: 14px;
+    max-width: 32ch;
+    font-size: 13px;
+  }
+
+  .cinematic-hero__cta {
+    margin-top: 22px;
+  }
+
+  .cinematic-hero__cta .btn-outline-on-image {
+    width: auto;
+  }
+
+  .featured-rail {
+    margin-inline: -16px;
+    padding-inline: 16px;
+    scrollbar-width: none;
+  }
+
+  .featured-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .featured-rail__item {
+    flex-basis: min(78vw, 260px);
+  }
+
+  .brand-chapter__media {
+    aspect-ratio: 5 / 6;
+  }
+
+  .brand-chapter__heritage {
+    font-size: 15px;
+  }
+
+  .trust-strip {
+    gap: 20px 12px;
+    padding-block: 28px;
+  }
+
+  .trust-strip__title {
+    font-size: 16px;
+  }
+
+  .newsletter {
+    max-width: none;
+  }
+
+  .newsletter__form {
+    flex-direction: column;
+  }
+
+  .newsletter__input,
+  .newsletter__form .btn-primary {
+    flex: none;
+    width: 100%;
+  }
+
+  .brand-showcase {
+    min-height: 240px;
+  }
+
+  .brand-showcase__stage {
+    grid-template-columns: 0.7fr 1.4fr 0.7fr;
+  }
+
+  .brand-showcase__label {
+    display: none;
+  }
+
+  .brand-showcase__nav {
+    width: 32px;
+    height: 32px;
+  }
+
+  .product-card .type-caption-md {
+    font-size: 12px;
+  }
+
+  .filter-chip {
+    height: 36px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .disclosure-row {
+    padding-block: 18px;
+    gap: 12px;
+  }
+
+  /* Horizontal chip / breadcrumb scroller */
+  .mobile-scroll-x {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+
+  .mobile-scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Touch devices: keep rail prices visible; gallery uses tap-to-lightbox */
+@media (hover: none) {
+  .pdp-gallery__main {
+    cursor: pointer;
+  }
+}
+
+.mobile-bottom-bar {
+  background: var(--color-canvas);
+  border-top: 1px solid var(--color-hairline);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+footer {
+  padding-bottom: 8px;
 }

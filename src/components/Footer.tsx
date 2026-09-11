@@ -41,12 +41,15 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer style={{ borderTop: "1px solid var(--color-hairline)" }}>
-      <div className="container-nike py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+    <footer
+      className="pb-2 md:pb-0"
+      style={{ borderTop: "1px solid var(--color-hairline)" }}
+    >
+      <div className="container-nike py-10 md:py-12 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
         {columns.map((col) => (
           <div key={col.title}>
-            <h3 className="type-body-strong mb-4">{col.title}</h3>
-            <ul className="space-y-3">
+            <h3 className="type-body-strong mb-3 md:mb-4">{col.title}</h3>
+            <ul className="space-y-2.5 md:space-y-3">
               {col.links.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="type-caption-md hover:opacity-70">

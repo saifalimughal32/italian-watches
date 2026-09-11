@@ -56,8 +56,8 @@ export default async function ProductPage({
   return (
     <div className="pdp-page bg-[var(--color-canvas)]">
       <Container>
-        <div className="section-rhythm pb-24 md:pb-0">
-          <p className="type-caption-md mb-6">
+        <div className="section-rhythm pb-28 md:pb-0">
+          <p className="type-caption-md mb-6 overflow-x-auto whitespace-nowrap scrollbar-none">
             <Link href="/">Home</Link> /{" "}
             <Link href={`/collections/${brandHandle}`}>{product.vendor}</Link> /{" "}
             {metafields.line || product.title}
@@ -73,7 +73,7 @@ export default async function ProductPage({
               >
                 {product.vendor}
               </Link>
-              <h1 className="type-heading-xl mt-3 normal-case">{product.title}</h1>
+              <h1 className="type-heading-xl mt-3 normal-case break-words">{product.title}</h1>
               {metafields.reference_number && (
                 <p className="type-caption-md mt-2 font-mono tracking-wide">
                   Ref. {metafields.reference_number}

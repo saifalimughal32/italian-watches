@@ -16,13 +16,18 @@ export function Header() {
       {/* announcement-bar */}
       <div className="announcement-bar">
         <p>
-          Free insured shipping across Pakistan on orders over Rs 50,000 · Authenticity guaranteed
+          <span className="announcement-bar__desktop">
+            Free insured shipping across Pakistan on orders over Rs 50,000 · Authenticity guaranteed
+          </span>
+          <span className="announcement-bar__mobile">
+            Free insured shipping over Rs 50,000
+          </span>
         </p>
       </div>
 
       {/* utility-bar */}
       <div
-        className="flex items-center justify-end h-9 px-4 md:px-10"
+        className="hidden sm:flex items-center justify-end h-9 px-4 md:px-10"
         style={{ background: "#000000" }}
       >
         <div className="type-caption-sm flex gap-4 text-[var(--color-on-primary)]">

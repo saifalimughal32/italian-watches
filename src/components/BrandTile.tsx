@@ -46,7 +46,10 @@ export function BrandTile({
               <p className="brand-editorial-tile__tagline">{brand.tagline}</p>
             )}
           </div>
-          <span className="btn-outline-on-image">Shop {brand.name}</span>
+          <span className="btn-outline-on-image brand-editorial-tile__cta">
+            <span className="md:hidden">Shop</span>
+            <span className="hidden md:inline">Shop {brand.name}</span>
+          </span>
         </div>
       </Link>
     );

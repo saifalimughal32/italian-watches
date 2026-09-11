@@ -19,18 +19,24 @@ export function MobileBottomBar() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 md:hidden"
-      style={{
-        background: "var(--color-canvas)",
-        borderTop: "1px solid var(--color-hairline)",
-      }}
+      className="mobile-bottom-bar fixed bottom-0 inset-x-0 z-40 md:hidden"
+      aria-label="Mobile navigation"
     >
       <div className="grid grid-cols-5 h-14">
-        {links.map((link) => (
+        {links.map((link) => {
+          const active =
+            link.href === "/"
+              ? pathname === "/"
+              : Boolean(pathname?.startsWith(link.href));
+
+          return (
           <Link
             key={link.href}
             href={link.href}
-            className="flex flex-col items-center justify-center gap-1 type-utility-xs uppercase"
+            className={`flex flex-col items-center justify-center gap-1 type-utility-xs uppercase ${
+              active ? "text-[var(--color-ink)]" : "text-[var(--color-mute)]"
+            }`}
+            aria-current={active ? "page" : undefined}
           >
             <span aria-hidden="true">
               {link.icon === "home" && (
@@ -67,7 +73,8 @@ export function MobileBottomBar() {
             </span>
             {link.label}
           </Link>
-        ))}
+          );
+        })}
       </div>
     </nav>
   );

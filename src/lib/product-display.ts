@@ -20,3 +20,15 @@ export function getProductDisplay(product: WatchProduct) {
     reference: product.metafields.reference_number,
   };
 }
+
+/** Prefer featured image, otherwise first gallery image. */
+export function getProductImage(product: WatchProduct) {
+  return product.imageUrl || product.images?.[0];
+}
+
+/** Full gallery with featured image first when available. */
+export function getProductGallery(product: WatchProduct) {
+  if (product.images && product.images.length > 0) return product.images;
+  if (product.imageUrl) return [product.imageUrl];
+  return [];
+}

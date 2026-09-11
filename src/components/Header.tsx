@@ -13,29 +13,19 @@ const primaryNav: Array<{ label: string; href: string; badge?: string }> = [
 export function Header() {
   return (
     <header>
-      {/* announcement-bar */}
+      {/* announcement + utility — single row */}
       <div className="announcement-bar">
-        <p>
+        <p className="announcement-bar__message">
           <span className="announcement-bar__desktop">
-            Free insured shipping across Pakistan on orders over Rs 50,000 · Authenticity guaranteed
+            Free insured shipping across Pakistan on orders over Rs 50,000 · Authenticity
+            guaranteed
           </span>
-          <span className="announcement-bar__mobile">
-            Free insured shipping over Rs 50,000
-          </span>
+          <span className="announcement-bar__mobile">Free insured shipping over Rs 50,000</span>
         </p>
-      </div>
-
-      {/* utility-bar */}
-      <div
-        className="hidden sm:flex items-center justify-end h-9 px-4 md:px-10"
-        style={{ background: "#000000" }}
-      >
-        <div className="type-caption-sm flex gap-4 text-[var(--color-on-primary)]">
+        <div className="announcement-bar__links type-caption-sm">
           <Link href="/faq">Help</Link>
-          <span className="hidden sm:inline text-[var(--color-stone)]">·</span>
-          <Link href="/contact" className="hidden sm:inline">
-            Join Us
-          </Link>
+          <span className="text-[var(--color-stone)]">·</span>
+          <Link href="/contact">Join Us</Link>
           <span className="text-[var(--color-stone)]">·</span>
           <Link href="/contact">Sign In</Link>
         </div>

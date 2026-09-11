@@ -489,24 +489,40 @@ a {
   padding-bottom: 2px;
 }
 
-/* Announcement bar */
+/* Announcement + utility — single black row */
 .announcement-bar {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 16px;
   min-height: 36px;
   padding: 8px 16px;
   background: #000000;
-  text-align: center;
 }
 
-.announcement-bar p {
+.announcement-bar__message {
+  margin: 0;
   font-size: var(--text-caption-sm);
   font-weight: 500;
   line-height: 1.4;
   color: var(--color-on-primary);
   letter-spacing: 0.01em;
-  max-width: 100%;
+  text-align: center;
+}
+
+.announcement-bar__links {
+  display: none;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-on-primary);
+}
+
+.announcement-bar__links a:hover {
+  opacity: 0.75;
 }
 
 .announcement-bar__mobile {
@@ -517,13 +533,34 @@ a {
   display: inline;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 640px) {
+  .announcement-bar {
+    padding: 8px 40px;
+  }
+
+  .announcement-bar__message {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: min(720px, calc(100% - 220px));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .announcement-bar__links {
+    display: flex;
+  }
+}
+
+@media (max-width: 639px) {
   .announcement-bar {
     min-height: 32px;
     padding: 6px 12px;
+    justify-content: center;
   }
 
-  .announcement-bar p {
+  .announcement-bar__message {
     font-size: 11px;
   }
 

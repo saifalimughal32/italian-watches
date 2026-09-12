@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { CodCheckoutForm } from "@/components/cart/CodCheckoutForm";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatPrice } from "@/lib/data";
 
@@ -44,7 +45,9 @@ export function CartPageContent() {
     <Container>
       <div className="section-rhythm max-w-3xl mx-auto">
         <h1 className="type-heading-xl normal-case">Your Bag</h1>
-        <p className="type-caption-md mt-2">{cart.totalQuantity} item{cart.totalQuantity === 1 ? "" : "s"}</p>
+        <p className="type-caption-md mt-2">
+          {cart.totalQuantity} item{cart.totalQuantity === 1 ? "" : "s"}
+        </p>
 
         <ul className="mt-10 divide-y" style={{ borderColor: "var(--color-hairline)" }}>
           {cart.lines.map((line) => (
@@ -54,7 +57,13 @@ export function CartPageContent() {
                 className="w-24 h-24 product-card-image relative overflow-hidden shrink-0"
               >
                 {line.imageUrl ? (
-                  <Image src={line.imageUrl} alt={line.title} fill sizes="96px" className="object-cover product-image-fit" />
+                  <Image
+                    src={line.imageUrl}
+                    alt={line.title}
+                    fill
+                    sizes="96px"
+                    className="object-cover product-image-fit"
+                  />
                 ) : null}
               </Link>
               <div className="flex-1 min-w-0">
@@ -105,11 +114,13 @@ export function CartPageContent() {
                 maximumFractionDigits: 0,
               }).format(subtotal)}
             </p>
+            <p className="type-caption-sm mt-2 text-[var(--color-mute)]">
+              Cash on Delivery available across Pakistan
+            </p>
           </div>
-          <Button href={cart.checkoutUrl} variant="primary">
-            Checkout
-          </Button>
         </div>
+
+        <CodCheckoutForm checkoutUrl={cart.checkoutUrl} />
       </div>
     </Container>
   );

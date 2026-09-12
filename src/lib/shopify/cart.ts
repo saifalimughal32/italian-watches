@@ -133,6 +133,105 @@ export async function removeCartLine(cartId: string, lineId: string): Promise<Ca
   return mapShopifyCart(data.cartLinesRemove.cart);
 }
 
+export type CodCheckoutDetails = {
+  fullName: string;
+  phone: string;
+  email?: string;
+  city: string;
+  address: string;
+  notes?: string;
+};
+
+const CART_ATTRIBUTES_UPDATE = `
+  ${CART_FRAGMENT}
+  mutation CartAttributesUpdate($cartId: ID!, $attributes: [AttributeInput!]!) {
+    cartAttributesUpdate(cartId: $cartId, attributes: $attributes) {
+      cart {
+        ...CartFields
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const CART_BUYER_IDENTITY_UPDATE = `
+  ${CART_FRAGMENT}
+  mutation CartBuyerIdentityUpdate($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+    cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
+      cart {
+        ...CartFields
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+/** Attach COD delivery details to the cart, then return checkout URL. */
+export async function prepareCodCheckout(
+  cartId: string,
+  details: CodCheckoutDetails
+): Promise<Cart> {
+  const attributes = [
+    { key: "Payment Method", value: "Cash on Delivery (COD)" },
+    { key: "Full Name", value: details.fullName },
+    { key: "Phone", value: details.phone },
+    { key: "City", value: details.city },
+    { key: "Address", value: details.address },
+    ...(details.notes?.trim()
+      ? [{ key: "Order Notes", value: details.notes.trim() }]
+      : []),
+  ];
+
+  const attrData = await shopifyFetch<{
+    cartAttributesUpdate: {
+      cart: Parameters<typeof mapShopifyCart>[0] | null;
+      userErrors: Array<{ message: string }>;
+    };
+  }>(CART_ATTRIBUTES_UPDATE, { cartId, attributes });
+
+  assertNoErrors(attrData.cartAttributesUpdate.userErrors);
+
+  const buyerIdentity: {
+    phone: string;
+    countryCode: "PK";
+    email?: string;
+  } = {
+    phone: details.phone,
+    countryCode: "PK",
+  };
+
+  if (details.email?.trim()) {
+    buyerIdentity.email = details.email.trim();
+  }
+
+  const buyerData = await shopifyFetch<{
+    cartBuyerIdentityUpdate: {
+      cart: Parameters<typeof mapShopifyCart>[0] | null;
+      userErrors: Array<{ message: string }>;
+    };
+  }>(CART_BUYER_IDENTITY_UPDATE, {
+    cartId,
+    buyerIdentity,
+  });
+
+  assertNoErrors(buyerData.cartBuyerIdentityUpdate.userErrors);
+  if (!buyerData.cartBuyerIdentityUpdate.cart) {
+    // Attributes already saved — still return the cart from attributes update
+    if (attrData.cartAttributesUpdate.cart) {
+      return mapShopifyCart(attrData.cartAttributesUpdate.cart);
+    }
+    throw new Error("Failed to prepare COD checkout");
+  }
+
+  return mapShopifyCart(buyerData.cartBuyerIdentityUpdate.cart);
+}
+
 export async function getCart(cartId: string): Promise<Cart | null> {
   const data = await shopifyFetch<{ cart: Parameters<typeof mapShopifyCart>[0] | null }>(
     GET_CART,

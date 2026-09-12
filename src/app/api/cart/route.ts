@@ -4,6 +4,7 @@ import {
   addToCart,
   createCart,
   getCart,
+  prepareCodCheckout,
   removeCartLine,
   updateCartLine,
 } from "@/lib/shopify/cart";
@@ -42,11 +43,17 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as {
-      action: "create" | "add" | "update" | "remove";
+      action: "create" | "add" | "update" | "remove" | "prepare-cod";
       cartId?: string;
       variantId?: string;
       lineId?: string;
       quantity?: number;
+      fullName?: string;
+      phone?: string;
+      email?: string;
+      city?: string;
+      address?: string;
+      notes?: string;
     };
 
     if (body.action === "create" && body.variantId) {
@@ -71,6 +78,31 @@ export async function POST(request: Request) {
     if (body.action === "remove" && body.lineId) {
       const cart = await removeCartLine(body.cartId, body.lineId);
       return NextResponse.json({ cart });
+    }
+
+    if (body.action === "prepare-cod") {
+      const fullName = body.fullName?.trim() ?? "";
+      const phone = body.phone?.trim() ?? "";
+      const city = body.city?.trim() ?? "";
+      const address = body.address?.trim() ?? "";
+
+      if (!fullName || !phone || !city || !address) {
+        return NextResponse.json(
+          { error: "Name, phone, city, and address are required for COD." },
+          { status: 400 }
+        );
+      }
+
+      const cart = await prepareCodCheckout(body.cartId, {
+        fullName,
+        phone,
+        email: body.email,
+        city,
+        address,
+        notes: body.notes,
+      });
+
+      return NextResponse.json({ cart, checkoutUrl: cart.checkoutUrl });
     }
 
     return NextResponse.json({ error: "Invalid cart action" }, { status: 400 });

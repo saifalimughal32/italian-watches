@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/components/cart/CartProvider";
 
@@ -9,12 +10,16 @@ export function AddToCartButton({
   className,
   showMessage = true,
   label = "Add to Bag",
+  redirectToCart = true,
 }: {
   variantId?: string;
   className?: string;
   showMessage?: boolean;
   label?: string;
+  /** After add, go straight to bag / COD form. */
+  redirectToCart?: boolean;
 }) {
+  const router = useRouter();
   const { addItem } = useCart();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
@@ -45,6 +50,10 @@ export function AddToCartButton({
           setMessage("");
           try {
             await addItem(variantId, 1);
+            if (redirectToCart) {
+              router.push("/cart");
+              return;
+            }
             setMessage("Added to bag");
           } catch (error) {
             setMessage(

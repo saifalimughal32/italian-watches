@@ -20,6 +20,7 @@ type CartContextValue = {
   updateLine: (lineId: string, quantity: number) => Promise<void>;
   removeLine: (lineId: string) => Promise<void>;
   refresh: () => Promise<void>;
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -120,9 +121,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const clearCart = useCallback(() => {
+    localStorage.removeItem(CART_STORAGE_KEY);
+    setCart(null);
+  }, []);
+
   const value = useMemo(
-    () => ({ cart, loading, addItem, updateLine, removeLine, refresh }),
-    [cart, loading, addItem, updateLine, removeLine, refresh]
+    () => ({ cart, loading, addItem, updateLine, removeLine, refresh, clearCart }),
+    [cart, loading, addItem, updateLine, removeLine, refresh, clearCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

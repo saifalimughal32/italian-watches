@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/components/cart/CartProvider";
 
@@ -24,7 +25,8 @@ const fieldClass =
   "w-full h-12 px-4 border border-[var(--color-hairline)] bg-[var(--color-canvas)] type-body-strong focus:outline-none focus:border-[var(--color-ink)]";
 
 export function CodCheckoutForm({ checkoutUrl }: { checkoutUrl: string }) {
-  const { cart } = useCart();
+  const router = useRouter();
+  const { cart, clearCart } = useCart();
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -39,8 +41,8 @@ export function CodCheckoutForm({ checkoutUrl }: { checkoutUrl: string }) {
       <p className="type-micro text-[var(--color-mute)]">Payment</p>
       <h2 className="type-heading-lg mt-2">Cash on Delivery</h2>
       <p className="type-caption-md mt-2 text-[var(--color-charcoal)]">
-        Pay in cash when your watch arrives. Fill your delivery details, then confirm COD at
-        checkout.
+        Pay in cash when your watch arrives. No Shopify checkout step — your order is placed
+        here.
       </p>
 
       <form
@@ -60,11 +62,10 @@ export function CodCheckoutForm({ checkoutUrl }: { checkoutUrl: string }) {
           const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
 
           try {
-            const response = await fetch("/api/cart", {
+            const response = await fetch("/api/cod-order", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                action: "prepare-cod",
                 cartId: cart.id,
                 fullName: data.fullName,
                 phone: data.phone,
@@ -77,20 +78,21 @@ export function CodCheckoutForm({ checkoutUrl }: { checkoutUrl: string }) {
 
             const json = (await response.json()) as {
               error?: string;
-              checkoutUrl?: string;
+              orderName?: string;
             };
 
-            if (!response.ok || !json.checkoutUrl) {
-              throw new Error(json.error ?? "Could not start COD checkout");
+            if (!response.ok || !json.orderName) {
+              throw new Error(json.error ?? "Could not place COD order");
             }
 
-            window.location.href = json.checkoutUrl;
+            clearCart();
+            router.push(
+              `/order/confirmation?order=${encodeURIComponent(json.orderName)}&payment=cod`
+            );
           } catch (submitError) {
             setStatus("error");
             setError(
-              submitError instanceof Error
-                ? submitError.message
-                : "Could not start COD checkout"
+              submitError instanceof Error ? submitError.message : "Could not place COD order"
             );
           }
         }}
@@ -197,13 +199,13 @@ export function CodCheckoutForm({ checkoutUrl }: { checkoutUrl: string }) {
         ) : null}
 
         <Button type="submit" variant="primary" className="w-full" disabled={status === "loading"}>
-          {status === "loading" ? "Preparing COD…" : "Place order with COD"}
+          {status === "loading" ? "Placing COD order…" : "Place order with COD"}
         </Button>
 
         <p className="type-caption-sm text-center text-[var(--color-mute)]">
           Prefer card / bank transfer?{" "}
           <a href={checkoutUrl} className="underline underline-offset-2 text-[var(--color-ink)]">
-            Continue to checkout
+            Continue to prepaid checkout
           </a>
         </p>
       </form>

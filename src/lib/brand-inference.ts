@@ -111,15 +111,22 @@ function matchKnownBrandName(vendor: string) {
 }
 
 export function inferBrandName(product: Pick<WatchProduct, "title" | "handle" | "vendor" | "tags">) {
+  const searchText = [product.title, product.handle, ...(product.tags ?? [])].join(" ");
+  const fromText = matchBrandFromText(searchText);
   const knownVendor = matchKnownBrandName(product.vendor);
+
+  // Title/handle signals win when they conflict with a mismatched vendor
+  // (e.g. a Rolex listed under a Tissot Shopify collection).
+  if (fromText && knownVendor && fromText !== knownVendor) {
+    return fromText;
+  }
+
   if (knownVendor) return knownVendor;
 
   if (!isGenericVendor(product.vendor)) {
     return product.vendor.trim();
   }
 
-  const searchText = [product.title, product.handle, ...product.tags].join(" ");
-  const fromText = matchBrandFromText(searchText);
   if (fromText) return fromText;
 
   return product.vendor.trim() || "Italian Watches";

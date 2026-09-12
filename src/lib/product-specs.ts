@@ -48,18 +48,22 @@ export function buildSpecRows(metafields: WatchMetafields): SpecRow[] {
     ["service_history", "Service history", metafields.service_history],
   ];
 
-  return rows.map(([key, label, value]) => ({
-    key,
-    label,
-    value: value?.trim() ? value : "—",
-  }));
+  return rows
+    .filter(([, , value]) => Boolean(value?.trim()))
+    .map(([key, label, value]) => ({
+      key,
+      label,
+      value: value.trim(),
+    }));
 }
 
 export function buildQuickSpecs(metafields: WatchMetafields) {
-  return [
-    ["Movement", metafields.movement || "—"],
-    ["Case", metafields.case_size_mm ? `${metafields.case_size_mm}mm` : "—"],
-    ["Material", formatList(metafields.case_material) || "—"],
-    ["Water", metafields.water_resistance || "—"],
-  ] as const;
+  return (
+    [
+      ["Movement", metafields.movement],
+      ["Case", metafields.case_size_mm ? `${metafields.case_size_mm}mm` : ""],
+      ["Material", formatList(metafields.case_material)],
+      ["Water", metafields.water_resistance],
+    ] as const
+  ).filter(([, value]) => Boolean(value?.trim()));
 }

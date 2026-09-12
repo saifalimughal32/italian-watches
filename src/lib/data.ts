@@ -116,52 +116,78 @@ export async function getBrand(handle: string): Promise<Brand | undefined> {
   );
 }
 
-export async function getProductsByBrand(brandName: string): Promise<WatchProduct[]> {
-  const products = await getProducts();
-  const brand = await getBrand(inferBrandHandle(brandName));
-  const targetHandle = brand?.handle ?? inferBrandHandle(brandName);
-  const targetName = brand?.name ?? brandName;
-
-  return products.filter(
-    (product) =>
-      product.vendor === targetName || inferBrandHandle(product.vendor) === targetHandle
+function productBelongsToBrand(
+  product: WatchProduct,
+  brand: Pick<Brand, "handle" | "name">
+) {
+  const resolved = withResolvedBrand(product);
+  return (
+    resolved.vendor === brand.name ||
+    inferBrandHandle(resolved.vendor) === brand.handle ||
+    slugify(resolved.vendor) === brand.handle
   );
 }
 
-function productMatchesCollection(handle: string, product: WatchProduct) {
-  const price = parseFloat(product.price);
-  const filters: Record<string, (item: WatchProduct) => boolean> = {
-    all: () => true,
-    "tissot-prx": (item) =>
-      item.metafields.line === "prx" || item.title.toLowerCase().includes("prx"),
-    "mens-watches": (item) =>
-      ["men", "unisex"].includes(item.metafields.gender) ||
-      item.title.toLowerCase().includes("men"),
-    "womens-watches": (item) =>
-      ["women", "unisex"].includes(item.metafields.gender) ||
-      item.title.toLowerCase().includes("women"),
-    "automatic-watches": (item) =>
-      item.metafields.movement === "automatic" ||
-      item.title.toLowerCase().includes("automatic"),
-    "chronograph-watches": (item) =>
-      item.metafields.is_chronograph ||
-      item.metafields.movement === "chronograph" ||
-      item.title.toLowerCase().includes("chronograph"),
-    "luxury-watches": (item) =>
-      item.metafields.tier === "luxury" ||
-      item.metafields.tier === "haute" ||
-      price >= 50000,
-    "premium-watches": (item) => item.metafields.tier === "premium" || price < 50000,
-    "new-arrivals": (item) => item.tags.includes("new"),
-    "best-sellers": (item) => item.tags.includes("bestseller"),
-    "limited-editions": (item) =>
-      item.metafields.is_limited || item.tags.includes("limited"),
+export async function getProductsByBrand(brandName: string): Promise<WatchProduct[]> {
+  const products = await getProducts();
+  const brand = await getBrand(inferBrandHandle(brandName));
+  const target = brand ?? {
+    handle: inferBrandHandle(brandName),
+    name: brandName,
   };
 
-  const vendorMatch = slugify(product.vendor) === handle || inferBrandHandle(product.vendor) === handle;
+  return products.filter((product) => productBelongsToBrand(product, target));
+}
+
+const COLLECTION_FILTERS: Record<string, (item: WatchProduct) => boolean> = {
+  all: () => true,
+  "tissot-prx": (item) => {
+    const resolved = withResolvedBrand(item);
+    const isTissot = inferBrandHandle(resolved.vendor) === "tissot";
+    return (
+      isTissot &&
+      (item.metafields.line === "prx" || item.title.toLowerCase().includes("prx"))
+    );
+  },
+  "mens-watches": (item) =>
+    ["men", "unisex"].includes(item.metafields.gender) ||
+    item.title.toLowerCase().includes("men"),
+  "womens-watches": (item) =>
+    ["women", "unisex"].includes(item.metafields.gender) ||
+    item.title.toLowerCase().includes("women"),
+  "automatic-watches": (item) =>
+    item.metafields.movement === "automatic" ||
+    item.title.toLowerCase().includes("automatic"),
+  "chronograph-watches": (item) =>
+    item.metafields.is_chronograph ||
+    item.metafields.movement === "chronograph" ||
+    item.title.toLowerCase().includes("chronograph"),
+  "luxury-watches": (item) => {
+    const price = parseFloat(item.price);
+    return (
+      item.metafields.tier === "luxury" ||
+      item.metafields.tier === "haute" ||
+      price >= 50000
+    );
+  },
+  "premium-watches": (item) => {
+    const price = parseFloat(item.price);
+    return item.metafields.tier === "premium" || price < 50000;
+  },
+  "new-arrivals": (item) => item.tags.includes("new"),
+  "best-sellers": (item) => item.tags.includes("bestseller"),
+  "limited-editions": (item) =>
+    item.metafields.is_limited || item.tags.includes("limited"),
+};
+
+function productMatchesCollection(handle: string, product: WatchProduct) {
+  const resolved = withResolvedBrand(product);
+  const vendorMatch =
+    slugify(resolved.vendor) === handle ||
+    inferBrandHandle(resolved.vendor) === handle;
   if (vendorMatch) return true;
 
-  const filter = filters[handle];
+  const filter = COLLECTION_FILTERS[handle];
   return filter ? filter(product) : false;
 }
 
@@ -183,10 +209,34 @@ export async function getCollectionProducts(handle: string): Promise<{
     try {
       const collection = await fetchCollectionByHandle(handle);
       if (collection && collection.products.length > 0) {
-        return {
-          ...collection,
-          products: onlyWatches(collection.products),
-        };
+        let products = onlyWatches(collection.products.map(withResolvedBrand));
+        const brand = await getBrand(handle);
+
+        // Brand collections: filter by resolved brand so Shopify mis-tags
+        // (e.g. Rolex inside Tissot) never leak through.
+        if (brand) {
+          products = products.filter((product) => productBelongsToBrand(product, brand));
+          if (products.length > 0) {
+            return {
+              title: brand.name,
+              description: collection.description || brand.heritage,
+              products,
+            };
+          }
+        } else if (handle in COLLECTION_FILTERS) {
+          products = products.filter((product) => productMatchesCollection(handle, product));
+          if (products.length > 0) {
+            return {
+              ...collection,
+              products,
+            };
+          }
+        } else {
+          return {
+            ...collection,
+            products,
+          };
+        }
       }
     } catch {
       // fall through
@@ -197,9 +247,8 @@ export async function getCollectionProducts(handle: string): Promise<{
   const brand = await getBrand(handle);
 
   if (brand) {
-    const brandProducts = products.filter(
-      (product) =>
-        product.vendor === brand.name || inferBrandHandle(product.vendor) === brand.handle
+    const brandProducts = products.filter((product) =>
+      productBelongsToBrand(product, brand)
     );
     if (brandProducts.length > 0) {
       return {
@@ -286,11 +335,21 @@ export async function getHomepageSlots(): Promise<HomepageSlot[]> {
 }
 
 export async function getJournalArticles(): Promise<JournalArticle[]> {
+  const curatedHeroes = Object.fromEntries(
+    mockJournalArticles.map((article) => [article.slug, article.hero])
+  );
+
+  const withPremiumHero = (article: JournalArticle): JournalArticle => ({
+    ...article,
+    hero: curatedHeroes[article.slug] ?? article.hero,
+  });
+
   if (!isShopifyConfigured()) return mockJournalArticles;
 
   try {
     const articles = await fetchJournalArticles();
-    return articles.length ? articles : mockJournalArticles;
+    if (!articles.length) return mockJournalArticles;
+    return articles.map(withPremiumHero);
   } catch {
     return mockJournalArticles;
   }

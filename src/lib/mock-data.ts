@@ -87,7 +87,7 @@ export const mockJournalArticles: JournalArticle[] = [
   {
     title: "How to choose your first automatic watch",
     slug: "first-automatic-watch",
-    hero: "/categories/automatic.jpg",
+    hero: "/journal/first-automatic.jpg",
     excerpt: "Movement, case size, and everyday wear — a calm guide for first-time collectors.",
     author: "Editorial",
     published_at: "2026-08-12",
@@ -95,7 +95,7 @@ export const mockJournalArticles: JournalArticle[] = [
   {
     title: "Why the PRX became a modern classic",
     slug: "tissot-prx-modern-classic",
-    hero: "/collections/tissot.jpg",
+    hero: "/journal/prx-classic.jpg",
     excerpt: "Integrated bracelet, Powermatic 80, and the return of 1970s sports elegance.",
     author: "Editorial",
     published_at: "2026-07-28",
@@ -103,7 +103,7 @@ export const mockJournalArticles: JournalArticle[] = [
   {
     title: "Reading a reference number like a specialist",
     slug: "reading-reference-numbers",
-    hero: "/collections/rolex.jpg",
+    hero: "/journal/reference-numbers.jpg",
     excerpt: "What the digits reveal about line, material, dial, and bracelet.",
     author: "Concierge",
     published_at: "2026-06-04",

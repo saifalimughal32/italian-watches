@@ -59,15 +59,6 @@ export function WatchCard({ product }: { product: WatchProduct }) {
       </div>
 
       <div className="pt-2 space-y-2">
-        <div className="flex gap-1.5">
-          <span
-            className="swatch-dot swatch-dot-active"
-            style={{ background: swatchColor }}
-          />
-          <span className="swatch-dot" style={{ background: "var(--color-soft-cloud)" }} />
-          <span className="swatch-dot" style={{ background: "var(--color-ink)" }} />
-        </div>
-
         <p className="type-caption-sm uppercase text-[var(--color-mute)]">{product.vendor}</p>
         <h3 className="type-body-strong line-clamp-2">{modelName}</h3>
         <p className="type-caption-md">{subtitle}</p>

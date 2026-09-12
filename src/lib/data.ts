@@ -174,10 +174,61 @@ const COLLECTION_FILTERS: Record<string, (item: WatchProduct) => boolean> = {
     const price = parseFloat(item.price);
     return item.metafields.tier === "premium" || price < 50000;
   },
-  "new-arrivals": (item) => item.tags.includes("new"),
-  "best-sellers": (item) => item.tags.includes("bestseller"),
+  "new-arrivals": (item) =>
+    item.tags.some((tag) =>
+      ["new", "new-arrival", "new arrivals", "featured"].includes(tag.toLowerCase())
+    ),
+  "best-sellers": (item) =>
+    item.tags.some((tag) =>
+      ["bestseller", "best-seller", "best seller", "featured"].includes(tag.toLowerCase())
+    ),
   "limited-editions": (item) =>
-    item.metafields.is_limited || item.tags.includes("limited"),
+    item.metafields.is_limited ||
+    item.tags.some((tag) => tag.toLowerCase().includes("limited")),
+};
+
+const CURATED_COLLECTIONS: Record<string, { title: string; description: string }> = {
+  all: { title: "All Watches", description: "Browse our complete catalog." },
+  "tissot-prx": {
+    title: "Tissot PRX",
+    description: "The icon of accessible Swiss luxury.",
+  },
+  "mens-watches": {
+    title: "Men's Watches",
+    description: "References sized and styled for everyday wear.",
+  },
+  "womens-watches": {
+    title: "Women's Watches",
+    description: "Elegant proportions and refined dials.",
+  },
+  "automatic-watches": {
+    title: "Automatic Watches",
+    description: "Self-winding movements for collectors and daily wear.",
+  },
+  "chronograph-watches": {
+    title: "Chronograph Watches",
+    description: "Sport complications with precision timing.",
+  },
+  "luxury-watches": {
+    title: "Luxury Watches",
+    description: "Haute horology and exceptional complications.",
+  },
+  "premium-watches": {
+    title: "Premium Watches",
+    description: "Swiss precision and everyday elegance.",
+  },
+  "new-arrivals": {
+    title: "New Arrivals",
+    description: "Fresh references just added to the maison.",
+  },
+  "best-sellers": {
+    title: "Best Sellers",
+    description: "The pieces collectors ask for most.",
+  },
+  "limited-editions": {
+    title: "Limited Editions",
+    description: "Scarce references with clear provenance.",
+  },
 };
 
 function productMatchesCollection(handle: string, product: WatchProduct) {
@@ -189,6 +240,18 @@ function productMatchesCollection(handle: string, product: WatchProduct) {
 
   const filter = COLLECTION_FILTERS[handle];
   return filter ? filter(product) : false;
+}
+
+function curatedCollectionFallback(handle: string, products: WatchProduct[]) {
+  const matched = products.filter((product) => productMatchesCollection(handle, product));
+  if (matched.length) return matched;
+
+  // Nav collections should never 404 when tags are missing in Shopify.
+  if (handle === "new-arrivals" || handle === "best-sellers") {
+    return products.slice(0, 24);
+  }
+
+  return matched;
 }
 
 export async function getCollectionProducts(handle: string): Promise<{
@@ -204,6 +267,8 @@ export async function getCollectionProducts(handle: string): Promise<{
       products,
     };
   }
+
+  const curated = CURATED_COLLECTIONS[handle];
 
   if (isShopifyConfigured()) {
     try {
@@ -223,14 +288,14 @@ export async function getCollectionProducts(handle: string): Promise<{
               products,
             };
           }
-        } else if (handle in COLLECTION_FILTERS) {
-          products = products.filter((product) => productMatchesCollection(handle, product));
-          if (products.length > 0) {
-            return {
-              ...collection,
-              products,
-            };
-          }
+        } else if (curated) {
+          // Trust Shopify membership for curated nav collections so missing
+          // local tags don't empty New Arrivals / Best Sellers.
+          return {
+            title: collection.title || curated.title,
+            description: collection.description || curated.description,
+            products,
+          };
         } else {
           return {
             ...collection,
@@ -269,34 +334,15 @@ export async function getCollectionProducts(handle: string): Promise<{
     };
   }
 
-  const filtered = products.filter((product) => productMatchesCollection(handle, product));
-  if (!filtered.length) return null;
+  if (curated) {
+    return {
+      title: curated.title,
+      description: curated.description,
+      products: curatedCollectionFallback(handle, products),
+    };
+  }
 
-  const titles: Record<string, string> = {
-    all: "All Watches",
-    "tissot-prx": "Tissot PRX",
-    "mens-watches": "Men's Watches",
-    "womens-watches": "Women's Watches",
-    "automatic-watches": "Automatic Watches",
-    "chronograph-watches": "Chronograph Watches",
-    "luxury-watches": "Luxury Watches",
-    "premium-watches": "Premium Watches",
-    "new-arrivals": "New Arrivals",
-    "best-sellers": "Best Sellers",
-    "limited-editions": "Limited Editions",
-  };
-
-  const descriptions: Record<string, string> = {
-    "tissot-prx": "The icon of accessible Swiss luxury.",
-    "luxury-watches": "Haute horology and exceptional complications.",
-    "premium-watches": "Swiss precision and everyday elegance.",
-  };
-
-  return {
-    title: titles[handle] ?? handle.replace(/-/g, " "),
-    description: descriptions[handle] ?? "",
-    products: filtered,
-  };
+  return null;
 }
 
 export async function searchCatalog(query: string): Promise<WatchProduct[]> {

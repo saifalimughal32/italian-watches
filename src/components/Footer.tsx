@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteLogo } from "@/components/brand/SiteLogo";
 
 const columns = [
   {
@@ -63,9 +64,12 @@ export function Footer() {
       </div>
       <div style={{ borderTop: "1px solid var(--color-hairline)" }}>
         <div className="container-nike py-6 flex flex-wrap gap-4 justify-between items-center">
-          <p className="type-utility-xs">
-            © {new Date().getFullYear()} Italian Watches. All rights reserved.
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+            <SiteLogo variant="footer" />
+            <p className="type-utility-xs">
+              © {new Date().getFullYear()} Italian Watches. All rights reserved.
+            </p>
+          </div>
           <div className="type-utility-xs flex gap-4">
             <Link href="/about">Terms</Link>
             <Link href="/about">Privacy</Link>

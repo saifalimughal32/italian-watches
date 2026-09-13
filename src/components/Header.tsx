@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HeaderActions } from "@/components/layout/HeaderActions";
+import { SiteLogo } from "@/components/brand/SiteLogo";
 
 const primaryNav: Array<{ label: string; href: string; badge?: string }> = [
   { label: "New & Featured", href: "/collections/new-arrivals", badge: "New" },
@@ -37,9 +38,7 @@ export function Header() {
         style={{ background: "var(--color-canvas)" }}
       >
         <div className="container-nike flex items-center justify-between h-14 md:h-16 gap-2 md:gap-4 min-w-0">
-          <Link href="/" className="type-body-strong shrink-0 tracking-tight text-sm md:text-base">
-            ITALIAN WATCHES
-          </Link>
+          <SiteLogo variant="header" />
 
           <nav className="hidden lg:flex items-center gap-6">
             {primaryNav.map((item) => (

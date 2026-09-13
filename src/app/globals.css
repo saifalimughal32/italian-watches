@@ -1335,6 +1335,32 @@ footer {
   padding-bottom: 8px;
 }
 
+/* Site logo */
+.site-logo__wordmark {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .site-logo__wordmark {
+    font-size: 15px;
+    letter-spacing: 0.16em;
+  }
+}
+
+@media (max-width: 380px) {
+  .site-logo__wordmark {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+}
+
 /* Cart drawer */
 .cart-drawer {
   position: fixed;

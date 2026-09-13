@@ -32,6 +32,38 @@ function splitName(fullName: string) {
   };
 }
 
+/** Shopify expects E.164. Convert common PK formats like 03XXXXXXXXX → +923XXXXXXXXX */
+export function normalizePakistanPhone(raw: string) {
+  const trimmed = raw.trim();
+  const digits = trimmed.replace(/[^\d+]/g, "");
+
+  let normalized = digits;
+  if (normalized.startsWith("+")) {
+    normalized = `+${normalized.slice(1).replace(/\D/g, "")}`;
+  } else {
+    const onlyDigits = normalized.replace(/\D/g, "");
+    if (onlyDigits.startsWith("0092")) {
+      normalized = `+${onlyDigits.slice(2)}`;
+    } else if (onlyDigits.startsWith("92")) {
+      normalized = `+${onlyDigits}`;
+    } else if (onlyDigits.startsWith("0") && onlyDigits.length >= 10) {
+      normalized = `+92${onlyDigits.slice(1)}`;
+    } else if (onlyDigits.length === 10) {
+      normalized = `+92${onlyDigits}`;
+    } else {
+      normalized = onlyDigits ? `+${onlyDigits}` : trimmed;
+    }
+  }
+
+  if (!/^\+92\d{10}$/.test(normalized)) {
+    throw new Error(
+      "Phone is invalid. Use a Pakistan mobile like 03XX XXXXXXX."
+    );
+  }
+
+  return normalized;
+}
+
 const DRAFT_ORDER_CREATE = `
   mutation CodDraftOrderCreate($input: DraftOrderInput!) {
     draftOrderCreate(input: $input) {
@@ -78,10 +110,11 @@ export async function createCodOrder(input: CodOrderInput): Promise<CodOrderResu
   }
 
   const { firstName, lastName } = splitName(input.fullName);
-  const phone = input.phone.trim();
+  const phone = normalizePakistanPhone(input.phone);
+  const phoneDisplay = input.phone.trim();
   const noteParts = [
     "Payment: Cash on Delivery (COD)",
-    `Phone: ${phone}`,
+    `Phone: ${phoneDisplay}`,
     `City: ${input.city}`,
     input.notes?.trim() ? `Notes: ${input.notes.trim()}` : null,
   ].filter(Boolean);
@@ -107,7 +140,7 @@ export async function createCodOrder(input: CodOrderInput): Promise<CodOrderResu
       },
       customAttributes: [
         { key: "Payment Method", value: "Cash on Delivery (COD)" },
-        { key: "Phone", value: phone },
+        { key: "Phone", value: phoneDisplay },
         { key: "City", value: input.city.trim() },
       ],
       lineItems: input.lines.map((line) => ({

@@ -39,7 +39,8 @@ export function WatchCard({ product }: { product: WatchProduct }) {
             src={imageUrl}
             alt={product.title}
             fill
-            sizes="(max-width: 768px) 50vw, 25vw"
+            sizes="(max-width: 768px) 50vw, 280px"
+            quality={70}
             className="object-cover product-image-fit"
           />
         ) : (

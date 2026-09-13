@@ -14,8 +14,13 @@ export function ProductGallery({
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [zoom, setZoom] = useState({ x: 50, y: 50, on: false });
+  const [mainLoaded, setMainLoaded] = useState(false);
 
   const current = gallery[active] ?? gallery[0];
+
+  useEffect(() => {
+    setMainLoaded(false);
+  }, [current]);
 
   const go = useCallback(
     (delta: number) => {
@@ -72,20 +77,25 @@ export function ProductGallery({
         aria-label="Open image lightbox"
       >
         <Image
+          key={current}
           src={current}
           alt={alt}
           fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover transition-opacity duration-500 ease-out"
+          sizes="(max-width: 1024px) 100vw, 640px"
+          quality={75}
+          className={`object-cover transition-opacity duration-300 ease-out ${
+            mainLoaded ? "opacity-100" : "opacity-0"
+          }`}
           style={{
-            // Mild crop of studio padding; hover zoom builds on top.
             transform: zoom.on ? "scale(1.75)" : "scale(1.06)",
             transformOrigin: `${zoom.x}% ${zoom.y}%`,
             transition: zoom.on
-              ? "transform 80ms linear"
-              : "transform 500ms ease-out, opacity 500ms ease-out",
+              ? "transform 80ms linear, opacity 300ms ease-out"
+              : "transform 400ms ease-out, opacity 300ms ease-out",
           }}
           priority
+          fetchPriority="high"
+          onLoad={() => setMainLoaded(true)}
         />
       </button>
 
@@ -104,7 +114,15 @@ export function ProductGallery({
               aria-label={`View image ${index + 1}`}
               aria-current={index === active}
             >
-              <Image src={image} alt="" fill sizes="64px" className="object-cover product-image-fit" />
+              <Image
+                src={image}
+                alt=""
+                fill
+                sizes="64px"
+                quality={60}
+                loading={index < 2 ? "eager" : "lazy"}
+                className="object-cover product-image-fit"
+              />
             </button>
           ))}
         </div>
@@ -128,7 +146,8 @@ export function ProductGallery({
               src={gallery[active]}
               alt={alt}
               fill
-              sizes="100vw"
+              sizes="(max-width: 768px) 100vw, 1100px"
+              quality={80}
               className="object-contain"
               priority
             />

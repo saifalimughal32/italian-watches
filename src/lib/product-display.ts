@@ -28,7 +28,19 @@ export function getProductImage(product: WatchProduct) {
 
 /** Full gallery with featured image first when available. */
 export function getProductGallery(product: WatchProduct) {
-  if (product.images && product.images.length > 0) return product.images;
-  if (product.imageUrl) return [product.imageUrl];
-  return [];
+  const images = product.images?.length
+    ? [...product.images]
+    : product.imageUrl
+      ? [product.imageUrl]
+      : [];
+
+  if (!images.length) return [];
+
+  if (product.imageUrl) {
+    const featured = product.imageUrl;
+    const rest = images.filter((url) => url !== featured);
+    return [featured, ...rest];
+  }
+
+  return images;
 }

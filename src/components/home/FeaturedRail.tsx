@@ -23,7 +23,8 @@ export function FeaturedRail({ products }: { products: WatchProduct[] }) {
                     src={imageUrl}
                     alt={product.title}
                     fill
-                    sizes="(max-width: 768px) 72vw, 25vw"
+                    sizes="(max-width: 768px) 72vw, 280px"
+                    quality={70}
                     className="object-cover product-image-fit transition-opacity duration-500 group-hover:opacity-90"
                   />
                 ) : (

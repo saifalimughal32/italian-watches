@@ -7,12 +7,12 @@ export const PRODUCT_CARD_FRAGMENT = `
     tags
     description
     featuredImage {
-      url
+      url(transform: { maxWidth: 900 })
       altText
     }
     images(first: 1) {
       nodes {
-        url
+        url(transform: { maxWidth: 900 })
         altText
       }
     }
@@ -66,12 +66,12 @@ export const PRODUCT_FRAGMENT = `
     description
     descriptionHtml
     featuredImage {
-      url
+      url(transform: { maxWidth: 1600 })
       altText
     }
     images(first: 8) {
       nodes {
-        url
+        url(transform: { maxWidth: 1600 })
         altText
       }
     }
@@ -161,7 +161,7 @@ export const CART_FRAGMENT = `
               title
               handle
               featuredImage {
-                url
+                url(transform: { maxWidth: 400 })
               }
             }
           }

@@ -11,10 +11,16 @@ export function isShopifyConfigured() {
   return Boolean(domain && token);
 }
 
+/** Legacy permanent Admin token OR Dev Dashboard client credentials. */
 export function isShopifyAdminConfigured() {
-  const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
-  const token = process.env.SHOPIFY_ADMIN_API_TOKEN;
-  return Boolean(domain?.trim() && token?.trim());
+  const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.trim();
+  if (!domain) return false;
+
+  if (process.env.SHOPIFY_ADMIN_API_TOKEN?.trim()) return true;
+
+  return Boolean(
+    process.env.SHOPIFY_CLIENT_ID?.trim() && process.env.SHOPIFY_CLIENT_SECRET?.trim()
+  );
 }
 
 export function getShopifyConfig() {
@@ -35,21 +41,71 @@ export function getShopifyConfig() {
   };
 }
 
-export function getShopifyAdminConfig() {
+export function getShopifyAdminShopDomain() {
   const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.trim();
-  const token = process.env.SHOPIFY_ADMIN_API_TOKEN?.trim();
+  if (!domain) {
+    throw new Error("NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN is not configured");
+  }
+  return normalizeDomain(domain);
+}
 
-  if (!domain || !token) {
+export function getShopifyAdminEndpoint() {
+  return `https://${getShopifyAdminShopDomain()}/admin/api/${API_VERSION}/graphql.json`;
+}
+
+let cachedToken: string | null = null;
+let cachedTokenExpiresAt = 0;
+
+/**
+ * Resolve an Admin API access token.
+ * Prefer legacy SHOPIFY_ADMIN_API_TOKEN; otherwise exchange Dev Dashboard
+ * client credentials (expires ~24h, auto-refreshed).
+ */
+export async function getShopifyAdminAccessToken(): Promise<string> {
+  const legacy = process.env.SHOPIFY_ADMIN_API_TOKEN?.trim();
+  if (legacy) return legacy;
+
+  const clientId = process.env.SHOPIFY_CLIENT_ID?.trim();
+  const clientSecret = process.env.SHOPIFY_CLIENT_SECRET?.trim();
+  if (!clientId || !clientSecret) {
     throw new Error(
-      "Shopify Admin API is not configured. Add SHOPIFY_ADMIN_API_TOKEN to place COD orders."
+      "Shopify Admin is not configured. Add SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET from Dev Dashboard (or legacy SHOPIFY_ADMIN_API_TOKEN)."
     );
   }
 
-  const storeDomain = normalizeDomain(domain);
+  if (cachedToken && Date.now() < cachedTokenExpiresAt - 60_000) {
+    return cachedToken;
+  }
 
-  return {
-    domain: storeDomain,
-    token,
-    endpoint: `https://${storeDomain}/admin/api/${API_VERSION}/graphql.json`,
+  const shop = getShopifyAdminShopDomain().replace(/\.myshopify\.com$/i, "");
+  const response = await fetch(`https://${shop}.myshopify.com/admin/oauth/access_token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      client_id: clientId,
+      client_secret: clientSecret,
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Shopify Admin token request failed (${response.status}). Install the Dev Dashboard app on this store and ensure draft_orders scopes are approved. ${text}`
+    );
+  }
+
+  const json = (await response.json()) as {
+    access_token?: string;
+    expires_in?: number;
   };
+
+  if (!json.access_token) {
+    throw new Error("Shopify Admin token response missing access_token");
+  }
+
+  cachedToken = json.access_token;
+  cachedTokenExpiresAt = Date.now() + (json.expires_in ?? 86_399) * 1000;
+  return cachedToken;
 }

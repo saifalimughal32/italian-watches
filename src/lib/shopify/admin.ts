@@ -1,4 +1,4 @@
-import { getShopifyAdminConfig } from "./config";
+import { getShopifyAdminAccessToken, getShopifyAdminEndpoint } from "./config";
 
 type GraphQLResponse<T> = {
   data?: T;
@@ -9,7 +9,8 @@ export async function shopifyAdminFetch<T>(
   query: string,
   variables: Record<string, unknown> = {}
 ): Promise<T> {
-  const { endpoint, token } = getShopifyAdminConfig();
+  const endpoint = getShopifyAdminEndpoint();
+  const token = await getShopifyAdminAccessToken();
 
   const response = await fetch(endpoint, {
     method: "POST",

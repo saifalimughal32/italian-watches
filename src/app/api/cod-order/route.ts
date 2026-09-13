@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "COD is not fully connected yet. Add SHOPIFY_ADMIN_API_TOKEN in Vercel env (Admin API custom app with draft_orders write access), then redeploy.",
+          "COD is not fully connected yet. In Shopify click “Build apps in Dev Dashboard”, create an app, add draft_orders + orders scopes, install it on this store, then add SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET in Vercel and redeploy.",
       },
       { status: 503 }
     );

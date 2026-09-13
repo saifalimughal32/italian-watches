@@ -17,6 +17,7 @@ const columns = [
       { label: "FAQ", href: "/faq" },
       { label: "Shipping", href: "/shipping" },
       { label: "Returns", href: "/returns" },
+      { label: "Warranty", href: "/warranty" },
       { label: "Contact", href: "/contact" },
     ],
   },

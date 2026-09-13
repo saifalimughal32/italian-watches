@@ -2,15 +2,41 @@ import { StaticPage } from "@/components/pages/StaticPage";
 
 export default function WarrantyPage() {
   return (
-    <StaticPage title="Warranty">
+    <StaticPage title="Warranty & Repair">
       <p>
-        All new watches sold by Italian Watches include the manufacturer&apos;s international warranty. Warranty duration and coverage vary by brand and are detailed in your purchase documentation.
+        All watches sold by Italian Watches come with a <strong>1-year limited
+        warranty</strong>, covering manufacturing defects and internal
+        malfunctions under normal use.
+      </p>
+
+      <h2 className="type-heading-lg !mt-10 !mb-3 text-[var(--color-ink)]">
+        What is covered
+      </h2>
+      <ul className="list-disc pl-5 space-y-3">
+        <li>Manufacturing defects</li>
+        <li>Internal malfunctions under normal use (machine warranty)</li>
+      </ul>
+
+      <h2 className="type-heading-lg !mt-10 !mb-3 text-[var(--color-ink)]">
+        What is not covered
+      </h2>
+      <ul className="list-disc pl-5 space-y-3">
+        <li>Accidental damage</li>
+        <li>Physical damage or colour damage</li>
+        <li>Misuse or abuse</li>
+        <li>Unauthorized repairs or tampering</li>
+      </ul>
+
+      <p>
+        You may still send a watch to us for repair assessment even when the issue
+        is outside warranty — we will examine it and advise on next steps.
       </p>
       <p>
-        Pre-owned and vintage pieces are sold with a 12-month Italian Watches guarantee covering authenticity and mechanical function at time of sale.
-      </p>
-      <p>
-        Warranty does not cover damage from accidents, misuse, unauthorized repairs, or normal wear. We recommend servicing mechanical watches every 3–5 years.
+        For warranty or repair support,{" "}
+        <a href="/contact" className="underline underline-offset-2 text-[var(--color-ink)]">
+          contact Customer Service
+        </a>{" "}
+        with your order details and proof of purchase.
       </p>
     </StaticPage>
   );

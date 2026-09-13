@@ -37,7 +37,7 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
           alt="Italian Watches"
           width={220}
           height={72}
-          className="h-14 w-auto md:h-16 object-contain"
+          className="h-12 w-auto max-w-[180px] md:h-16 md:max-w-none object-contain"
           decoding="async"
         />
       </Link>
@@ -58,7 +58,7 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
         className="h-8 w-8 md:h-9 md:w-9 object-contain shrink-0"
         decoding="async"
       />
-      <span className="site-logo__wordmark">Italian Watches</span>
+      <span className="site-logo__wordmark hidden md:inline">Italian Watches</span>
     </Link>
   );
 }

@@ -43,9 +43,9 @@ export function CollectionGrid({ products }: { products: WatchProduct[] }) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div className="collection-toolbar mb-8 md:flex md:flex-row md:items-center md:justify-between md:gap-4">
         <p className="type-caption-md">{filtered.length} watches</p>
-        <div className="flex flex-wrap gap-3">
+        <div className="collection-toolbar__controls md:flex md:flex-wrap md:gap-3">
           <label className="type-caption-sm uppercase text-[var(--color-mute)]">
             Tier
             <select
@@ -87,7 +87,7 @@ export function CollectionGrid({ products }: { products: WatchProduct[] }) {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-12">
+        <div className="collection-pagination flex items-center justify-center gap-4 mt-12">
           <button
             type="button"
             className="btn-secondary"

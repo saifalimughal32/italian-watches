@@ -8,7 +8,7 @@ import {
   mapSpecialist,
   type ShopifyProduct,
 } from "./mappers";
-import { PRODUCT_FRAGMENT } from "./fragments";
+import { PRODUCT_CARD_FRAGMENT, PRODUCT_FRAGMENT } from "./fragments";
 import type {
   Brand,
   Campaign,
@@ -18,11 +18,11 @@ import type {
   WatchProduct,
 } from "../types";
 
-const PAGE_SIZE = 250;
-const MAX_PAGES = 40;
+const PAGE_SIZE = 100;
+const MAX_PAGES = 8;
 
 const GET_PRODUCTS_PAGE = `
-  ${PRODUCT_FRAGMENT}
+  ${PRODUCT_CARD_FRAGMENT}
   query GetProductsPage($first: Int!, $after: String, $query: String) {
     products(first: $first, after: $after, query: $query) {
       pageInfo {
@@ -30,7 +30,7 @@ const GET_PRODUCTS_PAGE = `
         endCursor
       }
       nodes {
-        ...ProductFields
+        ...ProductCardFields
       }
     }
   }
@@ -46,7 +46,7 @@ const GET_PRODUCT_BY_HANDLE = `
 `;
 
 const GET_COLLECTION_BY_HANDLE = `
-  ${PRODUCT_FRAGMENT}
+  ${PRODUCT_CARD_FRAGMENT}
   query GetCollectionByHandle($handle: String!, $first: Int!, $after: String) {
     collection(handle: $handle) {
       title
@@ -58,7 +58,7 @@ const GET_COLLECTION_BY_HANDLE = `
           endCursor
         }
         nodes {
-          ...ProductFields
+          ...ProductCardFields
         }
       }
     }
@@ -310,4 +310,21 @@ export async function fetchSpecialists(): Promise<Specialist[]> {
 export async function searchProducts(query: string): Promise<WatchProduct[]> {
   const nodes = await fetchAllProductPages(query);
   return nodes.map(mapShopifyProduct);
+}
+
+/** Limited brand-scoped fetch for PDP rails — avoids loading the full catalog. */
+export async function fetchProductsForBrand(
+  brandName: string,
+  limit = 12
+): Promise<WatchProduct[]> {
+  const safe = brandName.replace(/"/g, "").trim();
+  if (!safe) return [];
+
+  const data = await shopifyFetch<ProductPage>(GET_PRODUCTS_PAGE, {
+    first: Math.min(limit * 2, 50),
+    after: null,
+    query: `vendor:${safe} OR title:${safe}`,
+  });
+
+  return data.products.nodes.map(mapShopifyProduct);
 }

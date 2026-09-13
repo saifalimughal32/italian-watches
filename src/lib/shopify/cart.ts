@@ -3,6 +3,8 @@ import { CART_FRAGMENT } from "./fragments";
 import { mapShopifyCart } from "./mappers";
 import type { Cart } from "../types";
 
+const NO_STORE = { cache: "no-store" as const };
+
 const CART_CREATE = `
   ${CART_FRAGMENT}
   mutation CartCreate($input: CartInput!) {
@@ -83,7 +85,7 @@ export async function createCart(variantId: string, quantity = 1): Promise<Cart>
     cartCreate: { cart: Parameters<typeof mapShopifyCart>[0] | null; userErrors: Array<{ message: string }> };
   }>(CART_CREATE, {
     input: { lines: [{ merchandiseId: variantId, quantity }] },
-  });
+  }, NO_STORE);
 
   assertNoErrors(data.cartCreate.userErrors);
   if (!data.cartCreate.cart) throw new Error("Failed to create cart");
@@ -96,7 +98,7 @@ export async function addToCart(cartId: string, variantId: string, quantity = 1)
   }>(CART_LINES_ADD, {
     cartId,
     lines: [{ merchandiseId: variantId, quantity }],
-  });
+  }, NO_STORE);
 
   assertNoErrors(data.cartLinesAdd.userErrors);
   if (!data.cartLinesAdd.cart) throw new Error("Failed to update cart");
@@ -113,7 +115,7 @@ export async function updateCartLine(
   }>(CART_LINES_UPDATE, {
     cartId,
     lines: [{ id: lineId, quantity }],
-  });
+  }, NO_STORE);
 
   assertNoErrors(data.cartLinesUpdate.userErrors);
   if (!data.cartLinesUpdate.cart) throw new Error("Failed to update cart line");
@@ -126,7 +128,7 @@ export async function removeCartLine(cartId: string, lineId: string): Promise<Ca
   }>(CART_LINES_REMOVE, {
     cartId,
     lineIds: [lineId],
-  });
+  }, NO_STORE);
 
   assertNoErrors(data.cartLinesRemove.userErrors);
   if (!data.cartLinesRemove.cart) throw new Error("Failed to remove cart line");
@@ -193,7 +195,7 @@ export async function prepareCodCheckout(
       cart: Parameters<typeof mapShopifyCart>[0] | null;
       userErrors: Array<{ message: string }>;
     };
-  }>(CART_ATTRIBUTES_UPDATE, { cartId, attributes });
+  }>(CART_ATTRIBUTES_UPDATE, { cartId, attributes }, NO_STORE);
 
   assertNoErrors(attrData.cartAttributesUpdate.userErrors);
 
@@ -218,7 +220,7 @@ export async function prepareCodCheckout(
   }>(CART_BUYER_IDENTITY_UPDATE, {
     cartId,
     buyerIdentity,
-  });
+  }, NO_STORE);
 
   assertNoErrors(buyerData.cartBuyerIdentityUpdate.userErrors);
   if (!buyerData.cartBuyerIdentityUpdate.cart) {
@@ -235,7 +237,8 @@ export async function prepareCodCheckout(
 export async function getCart(cartId: string): Promise<Cart | null> {
   const data = await shopifyFetch<{ cart: Parameters<typeof mapShopifyCart>[0] | null }>(
     GET_CART,
-    { cartId }
+    { cartId },
+    NO_STORE
   );
 
   return data.cart ? mapShopifyCart(data.cart) : null;

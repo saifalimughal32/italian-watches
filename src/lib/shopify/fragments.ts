@@ -1,3 +1,61 @@
+export const PRODUCT_CARD_FRAGMENT = `
+  fragment ProductCardFields on Product {
+    id
+    title
+    handle
+    vendor
+    tags
+    description
+    featuredImage {
+      url
+      altText
+    }
+    images(first: 1) {
+      nodes {
+        url
+        altText
+      }
+    }
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    variants(first: 3) {
+      nodes {
+        id
+        title
+        availableForSale
+        price {
+          amount
+          currencyCode
+        }
+      }
+    }
+    metafields(identifiers: [
+      { namespace: "watches", key: "line" },
+      { namespace: "watches", key: "gender" },
+      { namespace: "watches", key: "movement" },
+      { namespace: "watches", key: "tier" },
+      { namespace: "watches", key: "purchase_mode" },
+      { namespace: "watches", key: "is_limited" },
+      { namespace: "watches", key: "is_chronograph" },
+      { namespace: "custom", key: "line" },
+      { namespace: "custom", key: "gender" },
+      { namespace: "custom", key: "movement" },
+      { namespace: "custom", key: "tier" },
+      { namespace: "custom", key: "purchase_mode" },
+      { namespace: "custom", key: "is_limited" },
+      { namespace: "custom", key: "is_chronograph" }
+    ]) {
+      key
+      value
+      type
+    }
+  }
+`;
+
 export const PRODUCT_FRAGMENT = `
   fragment ProductFields on Product {
     id

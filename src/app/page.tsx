@@ -17,7 +17,7 @@ import {
 import { mockBrands } from "@/lib/mock-data";
 import Link from "next/link";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 const categories = [
   { title: "Men", href: "/collections/mens-watches", image: CATEGORY_COLLECTION_IMAGES["mens-watches"] },
@@ -29,10 +29,12 @@ const categories = [
 ];
 
 export default async function HomePage() {
-  const [brands, products, journal] = await Promise.all([
-    getBrands(),
+  const brandsPromise = getBrands();
+  const [brands, products, journal, brandChapter] = await Promise.all([
+    brandsPromise,
     getProducts(),
     getJournalArticles(),
+    brandsPromise.then((items) => getBrandChapterSlot(items.length ? items : mockBrands)),
   ]);
 
   const hauteBrands = enrichBrandsWithImages(
@@ -53,10 +55,6 @@ export default async function HomePage() {
       ? products.filter((p) => p.metafields.line === "prx").slice(0, 3)
       : products.slice(0, 3);
 
-  const brandChapter = await getBrandChapterSlot(
-    brands.length ? brands : mockBrands
-  );
-
   return (
     <>
       <CinematicHero
@@ -66,7 +64,6 @@ export default async function HomePage() {
         ctaLabel="Discover"
         ctaHref="/collections/all"
         stillSrc="/images/hero.jpg"
-        videoSrc="/videos/hero.mp4"
       />
 
       <section className="container-nike section-rhythm">

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { brandsFromProducts, mergeBrands, vendorToBrand } from "./brands";
 import { inferBrandHandle, withResolvedBrand } from "./brand-inference";
 import { mockBrands, mockHomepageSlots, mockJournalArticles, mockProducts } from "./mock-data";
@@ -11,6 +12,7 @@ import {
   fetchHomepageSlots,
   fetchJournalArticles,
   fetchProductByHandle,
+  fetchProductsForBrand,
   fetchSpecialists,
   searchProducts,
 } from "./shopify/queries";
@@ -54,7 +56,19 @@ function onlyWatches(products: WatchProduct[]) {
   return products.filter(isWatchCatalogProduct);
 }
 
-export async function getBrands(): Promise<Brand[]> {
+export const getProducts = cache(async (): Promise<WatchProduct[]> => {
+  if (!isShopifyConfigured()) return onlyWatches(mockProducts.map(withResolvedBrand));
+
+  try {
+    const products = await fetchAllProducts();
+    const resolved = onlyWatches(products.map(withResolvedBrand));
+    return resolved.length ? resolved : onlyWatches(mockProducts.map(withResolvedBrand));
+  } catch {
+    return onlyWatches(mockProducts.map(withResolvedBrand));
+  }
+});
+
+export const getBrands = cache(async (): Promise<Brand[]> => {
   if (!isShopifyConfigured()) return mockBrands;
 
   try {
@@ -72,21 +86,9 @@ export async function getBrands(): Promise<Brand[]> {
   } catch {
     return mockBrands;
   }
-}
+});
 
-export async function getProducts(): Promise<WatchProduct[]> {
-  if (!isShopifyConfigured()) return onlyWatches(mockProducts.map(withResolvedBrand));
-
-  try {
-    const products = await fetchAllProducts();
-    const resolved = onlyWatches(products.map(withResolvedBrand));
-    return resolved.length ? resolved : onlyWatches(mockProducts.map(withResolvedBrand));
-  } catch {
-    return onlyWatches(mockProducts.map(withResolvedBrand));
-  }
-}
-
-export async function getProduct(handle: string): Promise<WatchProduct | undefined> {
+export const getProduct = cache(async (handle: string): Promise<WatchProduct | undefined> => {
   if (!isShopifyConfigured()) {
     return onlyWatches(
       mockProducts.filter((product) => product.handle === handle).map(withResolvedBrand)
@@ -106,7 +108,7 @@ export async function getProduct(handle: string): Promise<WatchProduct | undefin
   return onlyWatches(
     mockProducts.filter((product) => product.handle === handle).map(withResolvedBrand)
   )[0];
-}
+});
 
 export async function getBrand(handle: string): Promise<Brand | undefined> {
   const brands = await getBrands();
@@ -129,13 +131,24 @@ function productBelongsToBrand(
 }
 
 export async function getProductsByBrand(brandName: string): Promise<WatchProduct[]> {
-  const products = await getProducts();
   const brand = await getBrand(inferBrandHandle(brandName));
   const target = brand ?? {
     handle: inferBrandHandle(brandName),
     name: brandName,
   };
 
+  if (isShopifyConfigured()) {
+    try {
+      const scoped = onlyWatches(
+        (await fetchProductsForBrand(target.name, 16)).map(withResolvedBrand)
+      ).filter((product) => productBelongsToBrand(product, target));
+      if (scoped.length) return scoped;
+    } catch {
+      // fall through to full catalog filter
+    }
+  }
+
+  const products = await getProducts();
   return products.filter((product) => productBelongsToBrand(product, target));
 }
 

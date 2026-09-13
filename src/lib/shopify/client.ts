@@ -5,11 +5,20 @@ type GraphQLResponse<T> = {
   errors?: Array<{ message: string }>;
 };
 
+type ShopifyFetchOptions = {
+  /** Catalog defaults to ISR; cart/mutations should use no-store. */
+  cache?: RequestCache;
+  revalidate?: number | false;
+};
+
 export async function shopifyFetch<T>(
   query: string,
-  variables: Record<string, unknown> = {}
+  variables: Record<string, unknown> = {},
+  options: ShopifyFetchOptions = {}
 ): Promise<T> {
   const { endpoint, token } = getShopifyConfig();
+  const cache = options.cache ?? "force-cache";
+  const revalidate = options.revalidate ?? 300;
 
   const response = await fetch(endpoint, {
     method: "POST",
@@ -18,7 +27,9 @@ export async function shopifyFetch<T>(
       "X-Shopify-Storefront-Access-Token": token,
     },
     body: JSON.stringify({ query, variables }),
-    next: { revalidate: 60 },
+    ...(cache === "no-store"
+      ? { cache: "no-store" as const }
+      : { next: { revalidate: revalidate === false ? 0 : revalidate } }),
   });
 
   if (!response.ok) {

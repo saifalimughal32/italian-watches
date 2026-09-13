@@ -40,8 +40,8 @@ export default async function CollectionPage({
     <>
       <div className="sticky-subnav" style={{ background: "var(--color-canvas)" }}>
         <Container>
-          <div className="flex items-center justify-between h-12 type-caption-md">
-            <span>Home / {title}</span>
+          <div className="flex items-center justify-between h-12 type-caption-md min-w-0">
+            <span className="truncate">Home / {title}</span>
           </div>
         </Container>
       </div>

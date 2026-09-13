@@ -155,7 +155,7 @@ export function ProductBuyBox({
             <p className="type-caption-sm text-[var(--color-mute)] truncate">{title}</p>
             <p className="type-body-strong truncate">{priceLabel}</p>
           </div>
-          <div className="shrink-0 min-w-[140px]">{stickyCta}</div>
+          <div className="shrink-0 w-[42%] max-w-[150px]">{stickyCta}</div>
         </div>
       </div>
     </div>

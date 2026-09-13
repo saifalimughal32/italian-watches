@@ -13,17 +13,13 @@ export default async function OrderConfirmationPage({
   searchParams: Promise<{ order?: string; payment?: string }>;
 }) {
   const params = await searchParams;
-  const orderName = params.order?.trim();
   const isCod = params.payment === "cod";
 
   return (
     <Container>
       <div className="section-rhythm max-w-xl mx-auto text-center">
         <p className="type-micro text-[var(--color-mute)]">Thank you</p>
-        <h1 className="type-heading-xl mt-3 normal-case">Order placed</h1>
-        {orderName ? (
-          <p className="type-heading-lg mt-6">Order {orderName}</p>
-        ) : null}
+        <h1 className="type-heading-xl mt-3 normal-case">Your order has been placed</h1>
         <p className="type-caption-md mt-4 text-[var(--color-charcoal)]">
           {isCod
             ? "Your Cash on Delivery order is confirmed. Pay the courier when your watch arrives."

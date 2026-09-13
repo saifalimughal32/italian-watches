@@ -3,23 +3,21 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/components/cart/CartProvider";
-import { CodOrderModal } from "@/components/cart/CodOrderModal";
 
 export function AddToCartButton({
   variantId,
   className,
   showMessage = true,
-  label = "Add to Bag",
+  label = "Add to Cart",
 }: {
   variantId?: string;
   className?: string;
   showMessage?: boolean;
   label?: string;
 }) {
-  const { addItem } = useCart();
+  const { addItem, openCart } = useCart();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
-  const [formOpen, setFormOpen] = useState(false);
 
   if (!variantId) {
     return (
@@ -47,10 +45,10 @@ export function AddToCartButton({
           setMessage("");
           try {
             await addItem(variantId, 1);
-            setFormOpen(true);
+            openCart();
           } catch (error) {
             setMessage(
-              error instanceof Error ? error.message : "Could not add to bag"
+              error instanceof Error ? error.message : "Could not add to cart"
             );
           } finally {
             setPending(false);
@@ -62,7 +60,6 @@ export function AddToCartButton({
       {showMessage && message && (
         <p className="type-caption-md mt-3 text-[var(--color-sale)]">{message}</p>
       )}
-      <CodOrderModal open={formOpen} onClose={() => setFormOpen(false)} />
     </div>
   );
 }

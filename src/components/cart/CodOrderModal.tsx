@@ -11,7 +11,7 @@ export function CodOrderModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { cart } = useCart();
+  const { cart, closeCart } = useCart();
 
   useEffect(() => {
     if (!open) return;
@@ -46,7 +46,10 @@ export function CodOrderModal({
           <CodCheckoutForm
             checkoutUrl={cart?.checkoutUrl}
             compact
-            onSuccess={() => onClose()}
+            onSuccess={() => {
+              onClose();
+              closeCart();
+            }}
           />
         </div>
       </div>

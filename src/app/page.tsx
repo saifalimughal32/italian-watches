@@ -64,6 +64,7 @@ export default async function HomePage() {
         ctaLabel="Discover"
         ctaHref="/collections/all"
         stillSrc="/images/hero.jpg"
+        stillSrcMobile="/images/hero-mobile.jpg"
       />
 
       <section className="container-nike section-rhythm">

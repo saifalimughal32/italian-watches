@@ -7,19 +7,10 @@ import { formatPrice } from "@/lib/data";
 import { getProductDisplay, getProductImage } from "@/lib/product-display";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 
-const swatchColors: Record<string, string> = {
-  Blue: "#1a3a5c",
-  Green: "#2d4a3e",
-  Black: "#111111",
-  steel: "#9e9ea0",
-  titanium: "#707072",
-};
-
 export function WatchCard({ product }: { product: WatchProduct }) {
   const { metafields } = product;
   const isNew = product.tags.includes("new");
   const isEnquiry = metafields.purchase_mode === "enquiry";
-  const swatchColor = swatchColors[metafields.dial_color] || swatchColors.steel;
   const { modelName, subtitle } = getProductDisplay(product);
   const imageUrl = getProductImage(product);
 

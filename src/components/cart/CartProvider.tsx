@@ -10,12 +10,16 @@ import {
   type ReactNode,
 } from "react";
 import type { Cart } from "@/lib/types";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const CART_STORAGE_KEY = "iw-cart-id";
 
 type CartContextValue = {
   cart: Cart | null;
   loading: boolean;
+  isOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
   addItem: (variantId: string, quantity?: number) => Promise<void>;
   updateLine: (lineId: string, quantity: number) => Promise<void>;
   removeLine: (lineId: string) => Promise<void>;
@@ -43,6 +47,10 @@ async function requestCart(body: Record<string, unknown>) {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openCart = useCallback(() => setIsOpen(true), []);
+  const closeCart = useCallback(() => setIsOpen(false), []);
 
   const refresh = useCallback(async () => {
     const cartId = localStorage.getItem(CART_STORAGE_KEY);
@@ -80,7 +88,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
           setCart(nextCart);
         }
       } catch (error) {
-        // Clear stale cart ids that cause repeated failures
         if (
           error instanceof Error &&
           /cart|not found|invalid/i.test(error.message)
@@ -127,11 +134,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ cart, loading, addItem, updateLine, removeLine, refresh, clearCart }),
-    [cart, loading, addItem, updateLine, removeLine, refresh, clearCart]
+    () => ({
+      cart,
+      loading,
+      isOpen,
+      openCart,
+      closeCart,
+      addItem,
+      updateLine,
+      removeLine,
+      refresh,
+      clearCart,
+    }),
+    [
+      cart,
+      loading,
+      isOpen,
+      openCart,
+      closeCart,
+      addItem,
+      updateLine,
+      removeLine,
+      refresh,
+      clearCart,
+    ]
   );
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      <CartDrawer />
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {

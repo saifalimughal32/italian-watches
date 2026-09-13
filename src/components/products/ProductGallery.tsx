@@ -78,9 +78,8 @@ export function ProductGallery({
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover transition-opacity duration-500 ease-out"
           style={{
-            // 1.28 crops padded studio shots so the watch fills the frame;
-            // hover zoom builds on top of that fit scale.
-            transform: zoom.on ? "scale(2.2)" : "scale(1.28)",
+            // Mild crop of studio padding; hover zoom builds on top.
+            transform: zoom.on ? "scale(1.75)" : "scale(1.06)",
             transformOrigin: `${zoom.x}% ${zoom.y}%`,
             transition: zoom.on
               ? "transform 80ms linear"

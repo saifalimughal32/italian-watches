@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { CodCheckoutForm } from "@/components/cart/CodCheckoutForm";
@@ -10,12 +11,13 @@ import { formatPrice } from "@/lib/data";
 
 export function CartPageContent() {
   const { cart, loading, updateLine, removeLine } = useCart();
+  const [showCodForm, setShowCodForm] = useState(false);
 
   if (loading && !cart) {
     return (
       <Container>
         <div className="section-rhythm text-center">
-          <p className="type-caption-md">Loading your bag...</p>
+          <p className="type-caption-md">Loading your cart...</p>
         </div>
       </Container>
     );
@@ -25,8 +27,8 @@ export function CartPageContent() {
     return (
       <Container>
         <div className="section-rhythm text-center max-w-lg mx-auto">
-          <h1 className="type-heading-xl normal-case">Your Bag</h1>
-          <p className="type-caption-md mt-4">Your bag is empty.</p>
+          <h1 className="type-heading-xl normal-case">Your Cart</h1>
+          <p className="type-caption-md mt-4">Your cart is empty.</p>
           <Button href="/collections/all" variant="primary" className="mt-8">
             Continue Shopping
           </Button>
@@ -44,7 +46,7 @@ export function CartPageContent() {
   return (
     <Container>
       <div className="section-rhythm max-w-3xl mx-auto">
-        <h1 className="type-heading-xl normal-case">Your Bag</h1>
+        <h1 className="type-heading-xl normal-case">Your Cart</h1>
         <p className="type-caption-md mt-2">
           {cart.totalQuantity} item{cart.totalQuantity === 1 ? "" : "s"}
         </p>
@@ -118,9 +120,26 @@ export function CartPageContent() {
               Cash on Delivery available across Pakistan
             </p>
           </div>
+          {!showCodForm && (
+            <Button variant="primary" onClick={() => setShowCodForm(true)}>
+              Buy with COD
+            </Button>
+          )}
         </div>
 
-        <CodCheckoutForm checkoutUrl={cart.checkoutUrl} />
+        {showCodForm ? (
+          <CodCheckoutForm checkoutUrl={cart.checkoutUrl} />
+        ) : cart.checkoutUrl ? (
+          <p className="type-caption-sm mt-6 text-center text-[var(--color-mute)]">
+            Prefer card / bank transfer?{" "}
+            <a
+              href={cart.checkoutUrl}
+              className="underline underline-offset-2 text-[var(--color-ink)]"
+            >
+              Continue to prepaid checkout
+            </a>
+          </p>
+        ) : null}
       </div>
     </Container>
   );

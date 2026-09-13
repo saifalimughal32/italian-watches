@@ -1,14 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 
 export function CartBadge() {
-  const { cart } = useCart();
+  const { cart, openCart } = useCart();
   const count = cart?.totalQuantity ?? 0;
 
   return (
-    <Link href="/cart" className="btn-icon-circular relative" aria-label="Cart">
+    <button
+      type="button"
+      onClick={openCart}
+      className="btn-icon-circular relative"
+      aria-label="Open cart"
+    >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
         <line x1="3" y1="6" x2="21" y2="6" />
@@ -19,6 +23,6 @@ export function CartBadge() {
           {count}
         </span>
       )}
-    </Link>
+    </button>
   );
 }

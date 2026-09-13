@@ -83,7 +83,7 @@ function ProductSpotlight({ product }: { product: WatchProduct }) {
             alt={product.title}
             fill
             sizes="(max-width: 640px) 100vw, 33vw"
-            className="object-cover"
+            className="object-contain p-[6%]"
           />
         ) : (
           <span className="type-caption-sm text-[var(--color-stone)] uppercase tracking-wide">

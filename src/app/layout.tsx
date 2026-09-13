@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -46,6 +47,7 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
           <MobileBottomBar />
+          <WhatsAppButton />
         </AppProviders>
       </body>
     </html>

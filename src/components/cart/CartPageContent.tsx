@@ -64,7 +64,7 @@ export function CartPageContent() {
                     alt={line.title}
                     fill
                     sizes="96px"
-                    className="object-cover product-image-fit"
+                    className="object-contain product-image-fit"
                   />
                 ) : null}
               </Link>

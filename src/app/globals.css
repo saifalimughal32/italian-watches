@@ -299,12 +299,12 @@ a {
   overflow: hidden;
 }
 
-/* Light crop of studio padding — keep the full watch readable */
+/* Full watch in frame — no artificial zoom crop */
 .product-image-fit {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
-  transform: scale(1.06);
-  transform-origin: center center;
+  transform: none;
+  padding: 6%;
 }
 
 /* Campaign tile */
@@ -1510,6 +1510,60 @@ a {
 
 footer {
   padding-bottom: 8px;
+}
+
+/* WhatsApp floating action */
+.whatsapp-fab {
+  position: fixed;
+  z-index: 55;
+  right: 16px;
+  bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 16px 0 14px;
+  border-radius: 999px;
+  background: #1f2a2e;
+  color: #f7f5f1;
+  box-shadow: 0 8px 24px rgba(11, 11, 12, 0.22);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.whatsapp-fab:hover {
+  background: #25d366;
+  color: #0b0b0c;
+  transform: translateY(-2px);
+}
+
+.whatsapp-fab__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.whatsapp-fab--pdp {
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .whatsapp-fab,
+  .whatsapp-fab--pdp {
+    right: 24px;
+    bottom: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-fab__label {
+    display: none;
+  }
+
+  .whatsapp-fab {
+    width: 52px;
+    padding: 0;
+    justify-content: center;
+  }
 }
 
 /* Site logo */

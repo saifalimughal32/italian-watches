@@ -94,7 +94,7 @@ export function CartDrawer() {
                           alt={line.title}
                           fill
                           sizes="80px"
-                          className="object-cover product-image-fit"
+                          className="object-contain product-image-fit"
                         />
                       ) : null}
                     </Link>

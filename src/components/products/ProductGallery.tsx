@@ -83,11 +83,11 @@ export function ProductGallery({
           fill
           sizes="(max-width: 1024px) 100vw, 640px"
           quality={75}
-          className={`object-cover transition-opacity duration-300 ease-out ${
+          className={`object-contain p-[6%] transition-opacity duration-300 ease-out ${
             mainLoaded ? "opacity-100" : "opacity-0"
           }`}
           style={{
-            transform: zoom.on ? "scale(1.75)" : "scale(1.06)",
+            transform: zoom.on ? "scale(1.35)" : "scale(1)",
             transformOrigin: `${zoom.x}% ${zoom.y}%`,
             transition: zoom.on
               ? "transform 80ms linear, opacity 300ms ease-out"
@@ -121,7 +121,7 @@ export function ProductGallery({
                 sizes="64px"
                 quality={60}
                 loading={index < 2 ? "eager" : "lazy"}
-                className="object-cover product-image-fit"
+                className="object-contain p-1"
               />
             </button>
           ))}
@@ -148,7 +148,7 @@ export function ProductGallery({
               fill
               sizes="(max-width: 768px) 100vw, 1100px"
               quality={80}
-              className="object-contain"
+              className="object-contain p-4"
               priority
             />
           </div>

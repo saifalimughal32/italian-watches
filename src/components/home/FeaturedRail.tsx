@@ -25,7 +25,7 @@ export function FeaturedRail({ products }: { products: WatchProduct[] }) {
                     fill
                     sizes="(max-width: 768px) 72vw, 280px"
                     quality={70}
-                    className="object-cover product-image-fit transition-opacity duration-500 group-hover:opacity-90"
+                    className="object-contain product-image-fit transition-opacity duration-500 group-hover:opacity-90"
                   />
                 ) : (
                   <span className="type-caption-sm text-[var(--color-stone)] uppercase tracking-wide">

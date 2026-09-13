@@ -82,13 +82,11 @@ export function CodCheckoutForm({
           }
 
           clearCart();
-          notify(`Your order has been placed — ${json.orderName}`);
+          notify("Your order has been placed");
           onSuccess?.(json.orderName);
 
           if (!onSuccess) {
-            router.push(
-              `/order/confirmation?order=${encodeURIComponent(json.orderName)}&payment=cod`
-            );
+            router.push(`/order/confirmation?payment=cod`);
           }
         } catch (submitError) {
           const message =

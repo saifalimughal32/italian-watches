@@ -1328,3 +1328,118 @@ a {
 footer {
   padding-bottom: 8px;
 }
+
+/* COD order modal */
+.cod-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .cod-modal {
+    align-items: center;
+    padding: 24px;
+  }
+}
+
+.cod-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(11, 11, 12, 0.55);
+  cursor: pointer;
+}
+
+.cod-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  max-height: min(92vh, 900px);
+  overflow: auto;
+  background: var(--color-canvas);
+  padding: 24px 20px 28px;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.18);
+}
+
+@media (min-width: 640px) {
+  .cod-modal__panel {
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.cod-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cod-modal__close {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-hairline);
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--color-ink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cod-modal__body {
+  margin-top: 4px;
+}
+
+/* Order placed toast */
+.order-toast-stack {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(420px, calc(100% - 32px));
+  pointer-events: none;
+}
+
+.order-toast {
+  pointer-events: auto;
+  padding: 14px 18px;
+  text-align: center;
+  font-size: var(--text-caption-md);
+  font-weight: 600;
+  color: var(--color-on-primary);
+  background: var(--color-ink);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  animation: order-toast-in 0.28s ease-out;
+}
+
+.order-toast--success {
+  background: var(--color-success);
+}
+
+.order-toast--error {
+  background: var(--color-sale-deep);
+}
+
+@keyframes order-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

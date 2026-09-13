@@ -1,28 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/components/cart/CartProvider";
+import { CodOrderModal } from "@/components/cart/CodOrderModal";
 
 export function AddToCartButton({
   variantId,
   className,
   showMessage = true,
   label = "Add to Bag",
-  redirectToCart = true,
 }: {
   variantId?: string;
   className?: string;
   showMessage?: boolean;
   label?: string;
-  /** After add, go straight to bag / COD form. */
-  redirectToCart?: boolean;
 }) {
-  const router = useRouter();
   const { addItem } = useCart();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
 
   if (!variantId) {
     return (
@@ -50,11 +47,7 @@ export function AddToCartButton({
           setMessage("");
           try {
             await addItem(variantId, 1);
-            if (redirectToCart) {
-              router.push("/cart");
-              return;
-            }
-            setMessage("Added to bag");
+            setFormOpen(true);
           } catch (error) {
             setMessage(
               error instanceof Error ? error.message : "Could not add to bag"
@@ -67,16 +60,9 @@ export function AddToCartButton({
         {pending ? "Adding..." : label}
       </Button>
       {showMessage && message && (
-        <p
-          className={`type-caption-md mt-3 ${
-            message === "Added to bag"
-              ? "text-[var(--color-success)]"
-              : "text-[var(--color-sale)]"
-          }`}
-        >
-          {message}
-        </p>
+        <p className="type-caption-md mt-3 text-[var(--color-sale)]">{message}</p>
       )}
+      <CodOrderModal open={formOpen} onClose={() => setFormOpen(false)} />
     </div>
   );
 }

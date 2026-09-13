@@ -826,7 +826,9 @@ a {
 /* ── Homepage: cinematic hero ── */
 .cinematic-hero {
   position: relative;
-  min-height: min(92vh, 860px);
+  isolation: isolate;
+  width: 100%;
+  min-height: min(88vh, 820px);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
@@ -837,20 +839,27 @@ a {
 .cinematic-hero__media {
   position: absolute;
   inset: 0;
+  z-index: 0;
 }
 
-.cinematic-hero__media img,
+.cinematic-hero__still {
+  object-fit: cover;
+  object-position: center center;
+}
+
+.cinematic-hero__still--mobile {
+  display: none;
+}
+
+.cinematic-hero__still--desktop {
+  display: block;
+}
+
 .cinematic-hero__media video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-}
-
-@media (max-width: 767px) {
-  .cinematic-hero__media img.cinematic-hero__still {
-    object-position: 62% 28%;
-  }
 }
 
 .cinematic-hero__video {
@@ -863,6 +872,7 @@ a {
   position: absolute;
   inset: 0;
   z-index: 2;
+  pointer-events: none;
   background:
     linear-gradient(
       to top,
@@ -904,6 +914,65 @@ a {
 
 .cinematic-hero__cta {
   margin-top: 32px;
+}
+
+@media (max-width: 767px) {
+  .cinematic-hero {
+    /* Leave room for announcement + header + bottom nav */
+    min-height: min(68svh, 560px);
+    max-height: min(72svh, 620px);
+    height: min(68svh, 560px);
+  }
+
+  .cinematic-hero__still--desktop {
+    display: none;
+  }
+
+  .cinematic-hero__still--mobile {
+    display: block;
+    object-position: center 22%;
+  }
+
+  .cinematic-hero__overlay {
+    background:
+      linear-gradient(
+        to top,
+        rgba(11, 11, 12, 0.88) 0%,
+        rgba(11, 11, 12, 0.45) 38%,
+        rgba(11, 11, 12, 0.2) 100%
+      );
+  }
+
+  .cinematic-hero__content {
+    padding: 28px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .cinematic-hero__brand {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .cinematic-hero__line {
+    max-width: min(12ch, 100%);
+    font-size: clamp(28px, 8.2vw, 40px);
+    line-height: 1.08;
+  }
+
+  .cinematic-hero__support {
+    margin-top: 12px;
+    max-width: 34ch;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .cinematic-hero__cta {
+    margin-top: 18px;
+  }
+
+  .cinematic-hero__cta .btn-outline-on-image {
+    width: auto;
+    max-width: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1172,37 +1241,6 @@ a {
     right: 10px;
     bottom: 10px;
     font-size: 11px;
-  }
-
-  .cinematic-hero {
-    min-height: min(78svh, 640px);
-  }
-
-  .cinematic-hero__content {
-    padding: 40px 16px calc(28px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .cinematic-hero__brand {
-    font-size: 16px;
-    margin-bottom: 12px;
-  }
-
-  .cinematic-hero__line {
-    max-width: 11ch;
-  }
-
-  .cinematic-hero__support {
-    margin-top: 14px;
-    max-width: 32ch;
-    font-size: 13px;
-  }
-
-  .cinematic-hero__cta {
-    margin-top: 22px;
-  }
-
-  .cinematic-hero__cta .btn-outline-on-image {
-    width: auto;
   }
 
   .featured-rail {

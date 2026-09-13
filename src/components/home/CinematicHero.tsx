@@ -1,6 +1,6 @@
 "use client";
 
-import { getImageProps } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -30,37 +30,25 @@ export function CinematicHero({
   const showVideo = Boolean(videoSrc) && !videoFailed;
   const mobileSrc = stillSrcMobile ?? stillSrc;
 
-  const common = {
-    alt: "",
-    fill: true as const,
-    priority: true,
-    sizes: "100vw",
-    className: "object-cover cinematic-hero__still",
-  };
-
-  const {
-    props: { srcSet: desktopSrcSet, ...desktopRest },
-  } = getImageProps({
-    ...common,
-    src: stillSrc,
-  });
-
-  const {
-    props: { srcSet: mobileSrcSet },
-  } = getImageProps({
-    ...common,
-    src: mobileSrc,
-  });
-
   return (
     <section className="cinematic-hero" aria-label="Campaign">
       <div className="cinematic-hero__media">
-        <picture>
-          <source media="(max-width: 767px)" srcSet={mobileSrcSet} sizes="100vw" />
-          <source media="(min-width: 768px)" srcSet={desktopSrcSet} sizes="100vw" />
-          {/* Decorative campaign still */}
-          <img {...desktopRest} alt="" />
-        </picture>
+        <Image
+          src={stillSrc}
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 767px) 0px, 100vw"
+          className="cinematic-hero__still cinematic-hero__still--desktop"
+        />
+        <Image
+          src={mobileSrc}
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 767px) 100vw, 0px"
+          className="cinematic-hero__still cinematic-hero__still--mobile"
+        />
         {showVideo && (
           <video
             className="cinematic-hero__video"

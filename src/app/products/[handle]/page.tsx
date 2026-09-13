@@ -56,8 +56,8 @@ export default async function ProductPage({
   return (
     <div className="pdp-page bg-[var(--color-canvas)]">
       <Container>
-        <div className="section-rhythm pb-28 md:pb-0">
-          <p className="type-caption-md mb-6 overflow-x-auto whitespace-nowrap scrollbar-none">
+        <div className="section-rhythm pb-32 md:pb-0">
+          <p className="type-caption-md mb-6 overflow-x-auto whitespace-nowrap scrollbar-none pr-2">
             <Link href="/">Home</Link> /{" "}
             <Link href={`/collections/${brandHandle}`}>{product.vendor}</Link> /{" "}
             {metafields.line || product.title}

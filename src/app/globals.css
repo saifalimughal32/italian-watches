@@ -288,6 +288,9 @@ a {
 .product-card {
   background: var(--color-canvas);
   border-radius: var(--radius-none);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .product-card-image {
@@ -299,12 +302,31 @@ a {
   overflow: hidden;
 }
 
-/* Full watch in frame — no artificial zoom crop */
+/* Full watch in frame — consistent padding, no crop zoom */
 .product-image-fit {
-  object-fit: contain;
-  object-position: center;
-  transform: none;
-  padding: 6%;
+  object-fit: contain !important;
+  object-position: center center;
+  transform: none !important;
+  padding: 10%;
+}
+
+.product-card > a {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+}
+
+.product-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  min-width: 0;
+}
+
+.product-card__meta .type-body-strong:first-of-type {
+  min-height: 2.6em;
 }
 
 /* Campaign tile */
@@ -922,10 +944,9 @@ a {
 
 @media (max-width: 767px) {
   .cinematic-hero {
-    /* Leave room for announcement + header + bottom nav */
-    min-height: min(68svh, 560px);
-    max-height: min(72svh, 620px);
-    height: min(68svh, 560px);
+    min-height: min(62svh, 520px);
+    max-height: min(68svh, 560px);
+    height: min(62svh, 520px);
   }
 
   .cinematic-hero__still--desktop {
@@ -934,7 +955,7 @@ a {
 
   .cinematic-hero__still--mobile {
     display: block;
-    object-position: center 22%;
+    object-position: center 30%;
   }
 
   .cinematic-hero__overlay {
@@ -942,35 +963,35 @@ a {
       linear-gradient(
         to top,
         rgba(11, 11, 12, 0.88) 0%,
-        rgba(11, 11, 12, 0.45) 38%,
-        rgba(11, 11, 12, 0.2) 100%
+        rgba(11, 11, 12, 0.42) 42%,
+        rgba(11, 11, 12, 0.18) 100%
       );
   }
 
   .cinematic-hero__content {
-    padding: 28px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    padding: 24px 16px 20px;
   }
 
   .cinematic-hero__brand {
-    font-size: 15px;
-    margin-bottom: 10px;
+    font-size: 14px;
+    margin-bottom: 8px;
   }
 
   .cinematic-hero__line {
-    max-width: min(12ch, 100%);
-    font-size: clamp(28px, 8.2vw, 40px);
-    line-height: 1.08;
+    max-width: min(14ch, 100%);
+    font-size: clamp(26px, 7.5vw, 36px);
+    line-height: 1.1;
   }
 
   .cinematic-hero__support {
-    margin-top: 12px;
-    max-width: 34ch;
-    font-size: 13px;
+    margin-top: 10px;
+    max-width: 36ch;
+    font-size: 12px;
     line-height: 1.45;
   }
 
   .cinematic-hero__cta {
-    margin-top: 18px;
+    margin-top: 16px;
   }
 
   .cinematic-hero__cta .btn-outline-on-image {
@@ -1337,16 +1358,22 @@ a {
 
   header .container-nike {
     min-width: 0;
-    gap: 8px;
+    gap: 10px;
+    align-items: center;
   }
 
   header .btn-icon-circular {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
   }
 
   .sticky-subnav {
     overflow-x: clip;
+  }
+
+  .product-image-fit {
+    padding: 12%;
   }
 
   .product-card .type-caption-md {
@@ -1354,7 +1381,7 @@ a {
   }
 
   .product-card .type-body-strong {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.35;
   }
 
@@ -1375,12 +1402,16 @@ a {
   }
 
   .section-rhythm {
-    padding-block: 36px;
+    padding-block: 32px;
   }
 
   .grid-products,
   .grid-products--3 {
-    gap: 10px 8px;
+    gap: 14px 10px;
+  }
+
+  .pdp-gallery__thumbs {
+    justify-content: flex-start;
   }
 
   /* Horizontal chip / breadcrumb scroller — avoid 100vw overflow */
@@ -1567,7 +1598,19 @@ footer {
 }
 
 /* Site logo */
+.site-logo--header {
+  align-items: center;
+}
+
+.site-logo__mark {
+  width: 36px;
+  height: 36px;
+  display: block;
+  flex-shrink: 0;
+}
+
 .site-logo__wordmark {
+  display: none;
   font-family: var(--font-display);
   font-size: 14px;
   font-weight: 500;
@@ -1578,16 +1621,41 @@ footer {
   white-space: nowrap;
 }
 
-@media (min-width: 768px) {
-  .site-logo__wordmark {
-    font-size: 15px;
-    letter-spacing: 0.16em;
+.header-actions {
+  gap: 4px;
+}
+
+@media (min-width: 640px) {
+  .header-actions {
+    gap: 10px;
   }
 }
 
-@media (max-width: 380px) {
+@media (min-width: 768px) {
+  .site-logo__mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .site-logo__wordmark {
+    display: inline;
+    font-size: 15px;
+    letter-spacing: 0.16em;
+  }
+
+  .header-actions {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 767px) {
   .site-logo__wordmark {
     display: none;
+  }
+
+  .site-logo__mark {
+    width: 34px;
+    height: 34px;
   }
 }
 

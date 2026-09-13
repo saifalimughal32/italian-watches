@@ -14,11 +14,11 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
         aria-label="Italian Watches home"
       >
         <img
-          src="/brand/mark-clean.png"
+          src="/brand/mark.svg"
           alt="Italian Watches"
           width={40}
           height={40}
-          className="h-10 w-10 object-contain"
+          className="h-10 w-10"
           decoding="async"
         />
       </Link>
@@ -33,11 +33,11 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
         aria-label="Italian Watches home"
       >
         <img
-          src="/brand/logo-clean.png"
+          src="/brand/logo.svg"
           alt="Italian Watches"
-          width={220}
-          height={72}
-          className="h-12 w-auto max-w-[180px] md:h-16 md:max-w-none object-contain"
+          width={200}
+          height={68}
+          className="h-12 w-auto max-w-[160px] md:h-14 md:max-w-none"
           decoding="async"
         />
       </Link>
@@ -47,18 +47,18 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
   return (
     <Link
       href="/"
-      className={`inline-flex items-center gap-2.5 shrink-0 min-w-0 ${className}`.trim()}
+      className={`site-logo site-logo--header inline-flex items-center gap-2 shrink-0 min-w-0 ${className}`.trim()}
       aria-label="Italian Watches home"
     >
       <img
-        src="/brand/mark-clean.png"
+        src="/brand/mark.svg"
         alt=""
         width={36}
         height={36}
-        className="h-8 w-8 md:h-9 md:w-9 object-contain shrink-0"
+        className="site-logo__mark"
         decoding="async"
       />
-      <span className="site-logo__wordmark hidden md:inline">Italian Watches</span>
+      <span className="site-logo__wordmark">Italian Watches</span>
     </Link>
   );
 }

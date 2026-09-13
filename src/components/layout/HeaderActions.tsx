@@ -20,7 +20,7 @@ export function HeaderActions() {
 
   return (
     <>
-      <div className="flex items-center gap-1.5 sm:gap-3 md:gap-4 shrink-0">
+      <div className="header-actions flex items-center shrink-0">
         <form action="/search" className="search-pill hidden md:flex">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mr-2 opacity-50">
             <circle cx="11" cy="11" r="8" />
@@ -34,7 +34,9 @@ export function HeaderActions() {
             <path d="M21 21l-4.35-4.35" />
           </svg>
         </Link>
-        <WishlistBadge />
+        <span className="hidden sm:inline-flex">
+          <WishlistBadge />
+        </span>
         <CartBadge />
         <button
           type="button"

@@ -83,11 +83,11 @@ export function ProductGallery({
           fill
           sizes="(max-width: 1024px) 100vw, 640px"
           quality={75}
-          className={`object-contain p-[6%] transition-opacity duration-300 ease-out ${
+          className={`object-contain p-[8%] transition-opacity duration-300 ease-out ${
             mainLoaded ? "opacity-100" : "opacity-0"
           }`}
           style={{
-            transform: zoom.on ? "scale(1.35)" : "scale(1)",
+            transform: zoom.on ? "scale(1.28)" : "scale(1)",
             transformOrigin: `${zoom.x}% ${zoom.y}%`,
             transition: zoom.on
               ? "transform 80ms linear, opacity 300ms ease-out"
@@ -100,7 +100,7 @@ export function ProductGallery({
       </button>
 
       {gallery.length > 1 && (
-        <div className="pdp-gallery__thumbs flex gap-2 mt-3 overflow-x-auto pb-1">
+        <div className="pdp-gallery__thumbs flex gap-2 mt-3 overflow-x-auto pb-1 justify-start md:justify-start">
           {gallery.slice(0, 8).map((image, index) => (
             <button
               key={`${image}-${index}`}

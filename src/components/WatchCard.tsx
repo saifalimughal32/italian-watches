@@ -50,11 +50,11 @@ export function WatchCard({ product }: { product: WatchProduct }) {
         )}
       </div>
 
-      <div className="pt-2 space-y-2">
+      <div className="pt-2 space-y-1.5 product-card__meta">
         <p className="type-caption-sm uppercase text-[var(--color-mute)]">{product.vendor}</p>
         <h3 className="type-body-strong line-clamp-2 break-words">{modelName}</h3>
-        <p className="type-caption-md line-clamp-2 break-words">{subtitle}</p>
-        <p className="type-body-strong">
+        <p className="type-caption-md line-clamp-1 break-words">{subtitle}</p>
+        <p className="type-body-strong mt-1">
           {isEnquiry ? (
             <span className="text-[var(--color-mute)]">Price on request</span>
           ) : (
